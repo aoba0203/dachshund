@@ -50,8 +50,8 @@ class TrainModel:
     train_x, train_y = self.__getPreprocessedDf(self.job.df_train, _params)
     test_x, test_y = self.__getPreprocessedDf(self.job.df_test, _params)    
     score, trained_model = self.job.model.getScore(train_x, train_y, test_x, test_y, _params['model'])
-    if self.best_score > score:
-      self.job.setTrainedModel(trained_model)
+    # if self.best_score > score:
+    #   self.job.setTrainedModel(trained_model)
     return {'loss': score, 'status': STATUS_OK}
   
   def __writeBestParams(self, _best):
@@ -61,27 +61,25 @@ class TrainModel:
       _best[key]= params[key][v_idx]
     self.__saveBestParams(_best)
   
-  def __writeBestModel(self):
-    filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
-    joblib.dump(self.job.trained_model, filepath)
+  # def __writeBestModel(self):
+  #   filepath = definitions.getBestModelFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
+  #   joblib.dump(self.job.trained_model, filepath)  
   
-  def __loadBestModel(self):
-    filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
-    return joblib.load(filepath)
-    
   def optimizeModel(self):
     hyper_space = self.__getHyperParamsSpace()
     max_iter = self.job.model.getMaxIterCount()
     best = fmin(self.__minizeScore, hyper_space, algo=tpe.suggest, max_evals=max_iter)
+    print(best)
     print('-optimize Model Success-')
-    self.__writeBestModel()
     self.__writeBestParams(best)
   
   def getTrainedScore(self):
-    model = self.__loadBestModel()    
     params = self.getBestParams()
-    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, params)    
-    return self.job.model.getTrainedModelScore(model, test_x, test_y, params, _for_optimize=False)
+    print(params)
+    train_x, train_y = self.__getPreprocessedDf(self.job.df_train, params)
+    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, params)
+    score, model = self.job.model.getScore(train_x, train_y, test_x, test_y, params, _for_optimize=False)
+    return score
   
   def __saveBestParams(self, _best):
     filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
