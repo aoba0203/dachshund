@@ -6,6 +6,7 @@ class Job:
     self.df_test = _test_df
     self.target_column = _target_column
     self.model = _model
+    self.score = 0
 
   def getJobName(self):
     return (str(self.model.model_name) + '_' + str(self.data_ratio) + '%')

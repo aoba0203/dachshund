@@ -7,6 +7,7 @@ from sklearn.linear_model import Lars
 import numpy as np
 import json
 from utils import definitions
+import datetime
 
 # outlier -> missing -> add -> scaler
 
@@ -83,16 +84,16 @@ class TrainModel:
     params = self.getBestParams()
     train_x, train_y = self.__getPreprocessedDf(self.job.df_train, params)
     test_x, test_y = self.__getPreprocessedDf(self.job.df_test, params)
-    return self.job.model.getScore(train_x, train_y, test_x, test_y, params['model'], _for_optimize=False)
+    return self.job.model.getScore(train_x, train_y, test_x, test_y, params, _for_optimize=False)
   
   def __saveBestParams(self, _best):
-    for key in _best.keys():
-      print(key, type(key))
-      if (type(_best[key]) == np.int32) & (type(_best[key]) == np.int64):
-        _best[key] = float(_best[key])
+    # for key in _best.keys():
+    #   print(key, type(key))
+    #   if (type(_best[key]) == np.int32) & (type(_best[key]) == np.int64):
+    #     _best[key] = float(_best[key])
     filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.project_name)
     with open(filepath, 'w') as result_file:
-      json.dump(_best, result_file)
+      json.dump(_best, result_file, default=self.myconverter)
       # result_file.close()
   
   def getBestParams(self):
@@ -103,3 +104,13 @@ class TrainModel:
       result_file.close()
       return best
     return {}
+
+  def myconverter(self, obj):
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, datetime.datetime):
+        return obj.__str__()
