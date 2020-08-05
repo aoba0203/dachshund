@@ -10,14 +10,14 @@ class HistGradientBoostingRegressor(model.Model, model_regression.ModelRegressio
     super().__init__(_project_name)
     self.model_name = 'HistGradientBoostingRegressor'
     self.params_list = {
-      'loss': ['least_squares', 'least_absolute_deviation', 'poisson'],
+      # 'loss': ['least_squares', 'least_absolute_deviation', 'poisson'],
       'max_leaf_nodes': np.hstack([[None], np.arange(24, 64)]),
       'max_depth': np.hstack([[None], np.arange(1, 24)]),
     }
 
   def getHyperParameterSpace(self):
     return {
-      'loss': hp.choice('loss', self.params_list['loss']),
+      # 'loss': hp.choice('loss', self.params_list['loss']),
       'learning_rate': hp.uniform('learning_rate', 0, 1),
       'max_iter': hp.quniform('max_iter', 80, 200, 5),
       'max_leaf_nodes': hp.choice('max_leaf_nodes', self.params_list['max_leaf_nodes']),

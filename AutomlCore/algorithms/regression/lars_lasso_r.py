@@ -7,6 +7,7 @@ class LARSLassoRegressor(model.Model, model_regression.ModelRegression):
   def __init__(self, _project_name):
     super().__init__(_project_name)
     self.model_name = 'LARSLassoRegressor'
+    self.params_list = {}
 
   def getHyperParameterSpace(self):
     return {

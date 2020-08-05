@@ -73,7 +73,6 @@ class TrainModel:
     self.__saveBestParams(_best)
     
   def optimizeModel(self):
-    print('optimizeModel: ' + str(self.job))
     hyper_space = self.__getHyperParamsSpace()
     max_iter = self.job.model.getMaxIterCount()
     best = fmin(self.__calcScore, hyper_space, algo=tpe.suggest, max_evals=max_iter)
@@ -91,13 +90,13 @@ class TrainModel:
     #   print(key, type(key))
     #   if (type(_best[key]) == np.int32) & (type(_best[key]) == np.int64):
     #     _best[key] = float(_best[key])
-    filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.project_name)
+    filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
     with open(filepath, 'w') as result_file:
       json.dump(_best, result_file, default=self.myconverter)
       # result_file.close()
   
   def getBestParams(self):
-    filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.project_name)
+    filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
     if os.path.exists(filepath):
       result_file = open(filepath, 'r')
       best = json.load(result_file)

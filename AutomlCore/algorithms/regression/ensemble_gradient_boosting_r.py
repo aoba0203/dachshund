@@ -11,7 +11,7 @@ class GradientBoostingRegressor(model.Model, model_regression.ModelRegression):
     self.params_list = {
       'loss': ['ls', 'lad', 'huber', 'quantile'],
       'criterion': ['friedman_mse', 'mse', 'mae'],
-      'max_features': [None, 'auto', 'sqrt','log2'],
+      # 'max_features': [None, 'auto', 'sqrt','log2'],
     }
 
   def getHyperParameterSpace(self):

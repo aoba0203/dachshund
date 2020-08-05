@@ -10,7 +10,7 @@ class ExtraTreesRegressor(model.Model, model_regression.ModelRegression):
     super().__init__(_project_name)
     self.model_name = 'ExtraTreesRegressor'
     self.params_list = {
-      'criterion': ['mse', 'mae'],
+      # 'criterion': ['mse', 'mae'],
       'max_depth': np.hstack([[None], np.arange(2, 48,2)]),
       'max_features': [None, 'auto', 'sqrt','log2'],
     }
