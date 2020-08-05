@@ -78,7 +78,7 @@ class WorkerAdmin(WorkerObserver):
     self.trained_job_list.append(_job)
     job_name = _job.getJobName()        
     del(self.process_dic[job_name])
-    print('Job End - ',  _job)
+    print('Job End - ',  _job, ', stage: ', self.train_stage, ', qsize: ', self.job_queue.qsize(), ', process size: ', len(self.process_dic))
     with self.lock:
       if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
         self.train_stage += 1
