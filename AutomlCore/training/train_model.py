@@ -69,13 +69,11 @@ class TrainModel:
     hyper_space = self.__getHyperParamsSpace()
     max_iter = self.job.model.getMaxIterCount()
     best = fmin(self.__minizeScore, hyper_space, algo=tpe.suggest, max_evals=max_iter)
-    print(best)
-    print('-optimize Model Success-')
+    # print('-optimize Model Success-')
     self.__writeBestParams(best)
   
   def getTrainedScore(self):
     params = self.getBestParams()
-    print(params)
     train_x, train_y = self.__getPreprocessedDf(self.job.df_train, params)
     test_x, test_y = self.__getPreprocessedDf(self.job.df_test, params)
     score, model = self.job.model.getScore(train_x, train_y, test_x, test_y, params, _for_optimize=False)

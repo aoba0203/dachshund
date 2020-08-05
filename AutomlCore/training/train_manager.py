@@ -30,6 +30,8 @@ class TrainManager:
   def startWorkerAdmin(self):
     worker_admin = WorkerAdmin(self.project_name, self.df, self.target_column, self.model_list)
     worker_admin.makeJobQueue(self.model_list)
+    for model in self.model_list:
+      print(model.model_name)
     worker_admin.startWorkers()
     return
   

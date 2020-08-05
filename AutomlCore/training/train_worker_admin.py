@@ -63,14 +63,17 @@ class WorkerAdmin(WorkerObserver):
   def startWorkers(self):
     print('startWorkers: q = ', self.job_queue.empty(), ', p_count: ', len(self.process_dic))
     while not self.job_queue.empty():
-      if len(self.process_dic) >= self.worker_count:
-        break;
+      # if len(self.process_dic) >= self.worker_count:
+      #   break;
       job = self.job_queue.get()
-      thread = Process(target=self.trainModel, args=(job, ))      
-      # thread = threading.Thread(target=self.trainModel, args=(job,))
-      self.process_dic[job.getJobName()] = thread
-      thread.daemon = True
-      thread.start()
+      worker = Worker(job)
+      worker.registerObserver(self)
+      worker.trainModel()
+      # thread = Process(target=self.trainModel, args=(job, ))      
+      # # thread = threading.Thread(target=self.trainModel, args=(job,))
+      # self.process_dic[job.getJobName()] = thread
+      # thread.daemon = True
+      # thread.start()
 
   def stopWorkers(self):
     sys.exit()
