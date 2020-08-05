@@ -18,6 +18,7 @@ class Worker(WorkerSubject):
       self.__observer_list.remove(observer)      
     
   def trainModel(self):    
+    self.trainer.optimizeModel()
     score = self.trainer.getTrainedScore()
     self.job.setScore(score)
     self.notifyObservers(self.EVENT_JOB_END)
