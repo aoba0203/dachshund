@@ -31,10 +31,10 @@ def __getBestModelFilePath(_project_name, _model_name, _data_ratio, _extends):
   return os.path.join(project_path, filename)
 
 def getBestModelParamsFilePath(_project_name, _model_name, _data_ratio):
-  return __getBestModelFilePath(_project_name, _model_name, _data_ratio, 'json')
+  return __getBestModelFilePath(_project_name, _model_name, _data_ratio, '.json')
 
 def getBestModelFilePath(_project_name, _model_name, _data_ratio):
-  return __getBestModelFilePath(_project_name, _model_name, _data_ratio, 'joblib')
+  return __getBestModelFilePath(_project_name, _model_name, _data_ratio, '.joblib')
 
 def getNumberOfCore():
   cpuCount = multiprocessing.cpu_count()

@@ -14,7 +14,8 @@ from multiprocessing import Process
 import threading
 from utils import utils
 import threading
-from threading import Lock
+# from threading import Lock
+from multiprocessing import Lock
 import queue
 
 class WorkerAdmin(WorkerObserver):
@@ -60,6 +61,7 @@ class WorkerAdmin(WorkerObserver):
     self.startWorkers()
   
   def startWorkers(self):
+    print('startWorkers: q = ', self.job_queue.empty(), ', p_count: ', len(self.process_dic))
     while not self.job_queue.empty():
       if len(self.process_dic) >= self.worker_count:
         break;
@@ -67,7 +69,7 @@ class WorkerAdmin(WorkerObserver):
       thread = Process(target=self.trainModel, args=(job, ))      
       # thread = threading.Thread(target=self.trainModel, args=(job,))
       self.process_dic[job.getJobName()] = thread
-      # thread.daemon = True
+      thread.daemon = True
       thread.start()
 
   def stopWorkers(self):
@@ -77,6 +79,7 @@ class WorkerAdmin(WorkerObserver):
     _worker.unregisterObserver(self)
     self.trained_job_list.append(_job)
     job_name = _job.getJobName()        
+    proc = self.process_dic[job_name]
     del(self.process_dic[job_name])
     print('Job End - ',  _job, ', stage: ', self.train_stage, ', qsize: ', self.job_queue.qsize(), ', process size: ', len(self.process_dic))
     with self.lock:
@@ -86,6 +89,8 @@ class WorkerAdmin(WorkerObserver):
         self.makeJobQueue(model_list)
         self.trained_job_list = []
       self.startWorkers()
+    print('process Close()')
+    proc.close()
 
   def __getSelectedTrainModelList(self):
     model_list = []
