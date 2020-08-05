@@ -19,7 +19,7 @@ class TweedieRegressor(model.Model, model_regression.ModelRegression):
   def getModel(self, _params):
     return twRegressor(
       alpha= _params['alpha'],
-      fit_intercept= _params['fit_intercept'],
+      fit_intercept= bool(_params['fit_intercept']),
       max_iter= int(_params['max_iter']),
     )
 

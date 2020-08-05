@@ -20,11 +20,11 @@ class PassiveAggresiveRegressor(model.Model, model_regression.ModelRegression):
 
   def getModel(self, _params):
     return passiveAggressive(
-      fit_intercept= _params['fit_intercept'],
+      fit_intercept= bool(_params['fit_intercept']),
       max_iter= int(_params['max_iter']),
-      early_stopping= _params['early_stopping'],
+      early_stopping= bool(_params['early_stopping']),
       validation_fraction= _params['validation_fraction'],
-      shuffle= _params['shuffle'],
+      shuffle= bool(_params['shuffle']),
     )
 
   def trainModel(self, x, y, _params):

@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.ensemble import ExtraTreesClassifier as ExtraTrees
-from sklearn.metrics import accuracy_score
 from hyperopt import hp
 from sklearn.utils import class_weight
 from utils import definitions
@@ -45,7 +44,7 @@ class ExtraTreesClassifier(model.Model, model_classification.ModelClassification
       # max_leaf_nodes= int(_params['max_leaf_nodes']),
       # min_impurity_decrease= _params['min_impurity_decrease'],
       # bootstrap= _params['bootstrap'],
-      oob_score= _params['oob_score'],
+      oob_score= bool(_params['oob_score']),
       class_weight= _params['class_weight'],
       # ccp_alpha= _params['ccp_alpha']
       n_jobs= definitions.getNumberOfCore(),

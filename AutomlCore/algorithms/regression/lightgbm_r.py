@@ -28,7 +28,7 @@ class LightGbmRegressor(model.Model, model_regression.ModelRegression):
 
   def getModel(self, _params):
     return LGBMRegressor(
-      max_depth= _params['max_depth'],
+      max_depth= int(_params['max_depth']),
       num_leaves= int((2 ** np.maximum(np.minimum(_params['max_depth'], 12), 2)) * 0.6),
       boosting_type= _params['boosting_type'],
       learning_rate= _params['learning_rate'],

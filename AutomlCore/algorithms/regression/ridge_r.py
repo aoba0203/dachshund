@@ -20,9 +20,9 @@ class RidgeRegressor(model.Model, model_regression.ModelRegression):
   def getModel(self, _params):
     return Ridge(
       alpha= _params['alpha'],
-      fit_intercept= _params['fit_intercept'],
-      normalize= _params['normalize'],
-      copy_X= _params['copy_X'],      
+      fit_intercept= bool(_params['fit_intercept']),
+      normalize= bool(_params['normalize']),
+      copy_X= bool(_params['copy_X']),      
     )
   
   def trainModel(self, x, y, _params):

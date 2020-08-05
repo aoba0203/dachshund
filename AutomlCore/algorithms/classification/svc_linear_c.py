@@ -27,7 +27,7 @@ class SvcLinearClassifier(model.Model, model_classification.ModelClassification)
     return LinearSVC(
       penalty= _params['penalty'],
       C= _params['C'],
-      fit_intercept= _params['fit_intercept'],
+      fit_intercept= bool(_params['fit_intercept']),
       class_weight= _params['class_weight'],
       max_iter= int(_params['max_iter']),
       # n_jobs= definitions.getNumberOfCore(),

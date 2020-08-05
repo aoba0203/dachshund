@@ -28,11 +28,11 @@ class SgdRegressor(model.Model, model_regression.ModelRegression):
       penalty= _params['penalty'], 
       alpha= _params['alpha'],
       l1_ratio= _params['l1_ratio'],
-      fit_intercept= _params['fit_intercept'],
+      fit_intercept= bool(_params['fit_intercept']),
       max_iter= int(_params['max_iter']),
-      shuffle= _params['shuffle'],
+      shuffle= bool(_params['shuffle']),
       power_t= _params['power_t'],
-      early_stopping= _params['early_stopping'],
+      early_stopping= bool(_params['early_stopping']),
     )
 
   def trainModel(self, x, y, _params):

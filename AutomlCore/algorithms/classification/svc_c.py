@@ -33,7 +33,7 @@ class SvcClassifier(model.Model, model_classification.ModelClassification):
       degree= _params['degree'],
       gamma= _params['gamma'],
       coef0= _params['coef0'],
-      shrinking= _params['shrinking'],
+      shrinking= bool(_params['shrinking']),
       class_weight= _params['class_weight'],
       cache_size= 2000,
       # n_jobs= definitions.getNumberOfCore(),

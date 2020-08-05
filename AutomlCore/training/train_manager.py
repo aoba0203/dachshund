@@ -74,7 +74,7 @@ class TrainManager:
       self.model_list.append(lars_lasso_r.LARSLassoRegressor(self.project_name))
       self.model_list.append(lightgbm_r.LightGbmRegressor(self.project_name))
       self.model_list.append(linear_r.LinearRegressor(self.project_name))
-      self.model_list.append(neural_network_r.NeuralNetworkRegressor(self.project_name))
+      # self.model_list.append(neural_network_r.NeuralNetworkRegressor(self.project_name))
       self.model_list.append(omp_r.OmpRegressor(self.project_name))
       self.model_list.append(passive_aggressive_r.PassiveAggresiveRegressor(self.project_name))
       self.model_list.append(ransac_r.RansacRegressor(self.project_name))

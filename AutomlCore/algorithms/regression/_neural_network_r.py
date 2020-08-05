@@ -40,7 +40,6 @@ class NeuralNetworkRegressor(model.Model, model_regression.ModelRegression):
       validation_fraction= _params['validation_fraction'],
       beta_1= _params['beta_1'],
       beta_2= _params['beta_2'],
-      n_jobs= definitions.getNumberOfCore(),
     )
 
   def trainModel(self, x, y, _params):

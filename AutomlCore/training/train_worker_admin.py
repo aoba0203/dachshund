@@ -85,15 +85,15 @@ class WorkerAdmin(WorkerObserver):
     proc = self.process_dic[job_name]
     del(self.process_dic[job_name])
     print('Job End - ',  _job, ', stage: ', self.train_stage, ', qsize: ', self.job_queue.qsize(), ', process size: ', len(self.process_dic))
-    with self.lock:
-      if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
-        self.train_stage += 1
-        model_list = self.__getSelectedTrainModelList()
-        self.makeJobQueue(model_list)
-        self.trained_job_list = []
-      self.startWorkers()
-    print('process Close()')
-    proc.close()
+    # with self.lock:
+    if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
+      self.train_stage += 1
+      model_list = self.__getSelectedTrainModelList()
+      self.makeJobQueue(model_list)
+      self.trained_job_list = []
+    self.startWorkers()
+    # print('process Close()')
+    # proc.close()
 
   def __getSelectedTrainModelList(self):
     model_list = []
