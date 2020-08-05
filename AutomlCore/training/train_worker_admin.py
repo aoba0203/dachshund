@@ -92,6 +92,7 @@ class WorkerAdmin(WorkerObserver):
     model_count = self.train_model_count_list[self.train_stage]
     self.trained_job_list.sort(key=lambda job:job.score)
     for idx, job in enumerate(self.trained_job_list):
+      print()
       if idx == (model_count):
         break
       model_list.append(job.model)

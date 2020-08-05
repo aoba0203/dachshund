@@ -44,7 +44,9 @@ class TrainModel:
     df = (list(self.f_missing.values())[_params['feature_missing']])(df)
     df = (list(self.f_outlier.values())[_params['feature_outlier']])(df)
     df = (list(self.f_add.values())[_params['feature_add']])(df)    
-    return df
+    x, y = self.__splitXy(df)
+    x = (list(self.f_scaler.values())[_params['feature_scaler']])(x)
+    return x, y
 
   def __splitXy(self, _df):
     y = _df[[self.job.target_column]]
@@ -52,13 +54,13 @@ class TrainModel:
     return x, y
   
   def __calcScore(self, _params):
-    train = self.__getPreprocessedDf(self.job.df_train, _params)
-    test = self.__getPreprocessedDf(self.job.df_test, _params)
-    train_x, train_y = self.__splitXy(train)
-    test_x, test_y = self.__splitXy(test)
+    train_x, train_y = self.__getPreprocessedDf(self.job.df_train, _params)
+    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, _params)
+    # train_x, train_y = self.__splitXy(train)
+    # test_x, test_y = self.__splitXy(test)
         
-    train_x = (list(self.f_scaler.values())[_params['feature_scaler']])(train_x)
-    test_x = (list(self.f_scaler.values())[_params['feature_scaler']])(test_x)    
+    # train_x = (list(self.f_scaler.values())[_params['feature_scaler']])(train_x)
+    # test_x = (list(self.f_scaler.values())[_params['feature_scaler']])(test_x)    
     score = self.job.model.getScore(train_x, train_y, test_x, test_y, _params['model'])
     return {'loss': score, 'status': STATUS_OK}
   
@@ -73,8 +75,14 @@ class TrainModel:
     hyper_space = self.__getHyperParamsSpace()
     max_iter = self.job.model.getMaxIterCount()
     best = fmin(self.__calcScore, hyper_space, algo=tpe.suggest, max_evals=max_iter)
-    print(best)
+    # print(best)
     self.__writeBestParams(best)
+  
+  def getTrainedScore(self):
+    params = self.getBestParams()
+    train_x, train_y = self.__getPreprocessedDf(self.job.df_train, params)
+    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, params)
+    return self.job.model.getScore(train_x, train_y, test_x, test_y, params['model'], _for_optimize=False)
   
   def __saveBestParams(self, _best):
     for key in _best.keys():

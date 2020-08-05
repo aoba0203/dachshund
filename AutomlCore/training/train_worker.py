@@ -17,9 +17,9 @@ class Worker(WorkerSubject):
     if observer in self.__observer_list:
       self.__observer_list.remove(observer)      
     
-  def trainModel(self):
-    # best = self.trainer.optimizeModel()
-    self.job.setScore((np.random.randint(100) / 100.0))
+  def trainModel(self):    
+    score = self.trainer.getTrainedScore()
+    self.job.setScore(score)
     self.notifyObservers(self.EVENT_JOB_END)
   
   def notifyObservers(self, _event):

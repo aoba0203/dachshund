@@ -12,3 +12,6 @@ class Job:
 
   def setScore(self, _score):
     self.score = _score
+  
+  def __str__(self):
+    return (self.getJobName() + '=' + str(self.score))
