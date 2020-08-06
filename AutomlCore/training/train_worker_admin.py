@@ -1,6 +1,4 @@
 from abc import abstractclassmethod
-from dachshund.AutomlCore.build.lib.preprocess.feature_scaler import f_scaler
-from dachshund.AutomlCore.build.lib.preprocess.feature_add import f_add
 
 class WorkerObserver:
   @abstractclassmethod
@@ -116,6 +114,9 @@ class WorkerAdmin(WorkerObserver):
     for job in self.trained_job_list:
       modelname_list.append(job.model.model_name)
       dataratio_list.append(job.data_ratio)
+      print(job.best_params)
+      print('mis_list: ', job.best_params[KEY_FEATURE_MIS_NAME_LIST])
+      print('mis_name', [job.best_params[KEY_FEATURE_MIS_NAME]])
       f_missing_list.append(job.best_params[KEY_FEATURE_MIS_NAME_LIST][job.best_params[KEY_FEATURE_MIS_NAME]])
       f_outlier_list.append(job.best_params[KEY_FEATURE_OUT_NAME_LIST][job.best_params[KEY_FEATURE_OUT_NAME]])
       f_add_list.append(job.best_params[KEY_FEATURE_ADD_NAME_LIST][job.best_params[KEY_FEATURE_ADD_NAME]])

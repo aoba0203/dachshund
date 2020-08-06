@@ -50,7 +50,9 @@ class TrainModel:
   
   def __minizeScore(self, _params):
     train_x, train_y = self.__getPreprocessedDf(self.job.df_train, _params)
-    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, _params)    
+    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, _params)
+    print(self.job)
+    print(self.job.model)
     score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, _params['model'])
     # if self.best_score > score:
     #   self.job.setTrainedModel(trained_model)
@@ -61,10 +63,10 @@ class TrainModel:
     for key, value in zip(params.keys(), params.values()):
       v_idx = _best[key]
       _best[key]= params[key][v_idx]    
-    _best[KEY_FEATURE_ADD_NAME_LIST] = self.f_add.keys()
-    _best[KEY_FEATURE_MIS_NAME_LIST] = self.f_missing.keys()
-    _best[KEY_FEATURE_OUT_NAME_LIST] = self.f_outlier.keys()
-    _best[KEY_FEATURE_SCA_NAME_LIST] = self.f_scaler.keys()
+    _best[KEY_FEATURE_ADD_NAME_LIST] = list(self.f_add.keys())
+    _best[KEY_FEATURE_MIS_NAME_LIST] = list(self.f_missing.keys())
+    _best[KEY_FEATURE_OUT_NAME_LIST] = list(self.f_outlier.keys())
+    _best[KEY_FEATURE_SCA_NAME_LIST] = list(self.f_scaler.keys())
     self.__saveBestParams(_best)
   
   def __saveTrainedModel(self, _model):
