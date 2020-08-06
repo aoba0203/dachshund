@@ -51,8 +51,6 @@ class TrainModel:
   def __minizeScore(self, _params):
     train_x, train_y = self.__getPreprocessedDf(self.job.df_train, _params)
     test_x, test_y = self.__getPreprocessedDf(self.job.df_test, _params)
-    print(self.job)
-    print(self.job.model)
     score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, _params['model'])
     # if self.best_score > score:
     #   self.job.setTrainedModel(trained_model)

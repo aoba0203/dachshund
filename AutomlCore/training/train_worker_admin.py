@@ -30,8 +30,8 @@ class WorkerAdmin(WorkerObserver):
     self.model_list = _model_list    
     self.worker_count = _worker_count
     self.train_stage = 0
-    self.train_model_count_list = [20, 15, 7, 5]
-    self.train_data_ratio_list = [15, 30, 50, 100]
+    self.train_model_count_list = [20, 10, 7, 5, 3]
+    self.train_data_ratio_list = [15, 30, 40, 50, 100]
     self.job_list = []
     self.trained_job_list = []
     self.process_dic = {}
@@ -115,8 +115,6 @@ class WorkerAdmin(WorkerObserver):
       modelname_list.append(job.model.model_name)
       dataratio_list.append(job.data_ratio)
       print(job.best_params)
-      print('mis_list: ', job.best_params[KEY_FEATURE_MIS_NAME_LIST])
-      print('mis_name', [job.best_params[KEY_FEATURE_MIS_NAME]])
       f_missing_list.append(job.best_params[KEY_FEATURE_MIS_NAME_LIST][job.best_params[KEY_FEATURE_MIS_NAME]])
       f_outlier_list.append(job.best_params[KEY_FEATURE_OUT_NAME_LIST][job.best_params[KEY_FEATURE_OUT_NAME]])
       f_add_list.append(job.best_params[KEY_FEATURE_ADD_NAME_LIST][job.best_params[KEY_FEATURE_ADD_NAME]])

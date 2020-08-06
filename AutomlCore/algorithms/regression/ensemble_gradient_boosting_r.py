@@ -9,8 +9,10 @@ class GradientBoostingRegressor(model.Model, model_regression.ModelRegression):
     super().__init__(_project_name)
     self.model_name = 'GradientBoostingRegressor'
     self.params_list = {
-      'loss': ['ls', 'lad', 'huber', 'quantile'],
-      'criterion': ['friedman_mse', 'mse', 'mae'],
+      # 'loss': ['ls', 'lad', 'huber', 'quantile'],
+      'loss': ['ls', 'lad', 'quantile'],
+      # 'criterion': ['friedman_mse', 'mse', 'mae'],
+      'criterion': ['friedman_mse', 'mse'],
       # 'max_features': [None, 'auto', 'sqrt','log2'],
     }
 

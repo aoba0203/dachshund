@@ -40,4 +40,4 @@ class Model:
   
   def getMaxIterCount(self):
     params_count = len(self.getHyperParameterSpace())
-    return 2 ** np.minimum(8, (params_count + 2))
+    return 2 ** np.minimum(5, (params_count + 2))

@@ -30,11 +30,12 @@ from utils import definitions
 #%%
 class PdProfiling(data_explore.Visualizer):
   def getVisualizerHtmlFilePath(self):
-    eda_path = definitions.getEdaPath()
-    results_path = os.path.join(eda_path, 'results')
-    if os.path.exists(results_path) == False:
-      os.makedirs(results_path)
-    return os.path.join(results_path, (self.project_name + '-pandas_profiling.html'))
+    # eda_path = definitions.getEdaPath()
+    # results_path = os.path.join(eda_path, 'results')
+    path_result = definitions.getProjectResultsPath(self.project_name)
+    if os.path.exists(path_result) == False:
+      os.makedirs(path_result)
+    return os.path.join(path_result, (self.project_name + '-pandas_profiling.html'))
 
 
   def makeVisualizerHtmlFile(self):
