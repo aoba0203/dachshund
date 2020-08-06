@@ -17,6 +17,9 @@ class Job:
   
   def setTrainedModel(self, _trained_model):
     self.trained_model = _trained_model
+  
+  def setParams(self, _params):
+    self.best_params = _params
 
   def __str__(self):
     return (self.getJobName() + '=' + str(self.score))

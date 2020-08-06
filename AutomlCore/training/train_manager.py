@@ -5,7 +5,7 @@ from algorithms.classification import nearest_centroid_c, neural_network_c, sgd_
 from algorithms.classification import nusvc_c, svc_c, svc_linear_c
 
 from algorithms.regression import ard_regression_r, bayesian_ridge_r, elasticnet_r, ensemble_adaboost_r, ensemble_extra_tree_r, ensemble_gradient_boosting_r, ensemble_hist_gradient_boosting_r, ensemble_random_forest_r
-from algorithms.regression import lars_r, lars_lasso_r, lightgbm_r, linear_r, neural_network_r, omp_r, passive_aggressive_r, ransac_r, ridge_r
+from algorithms.regression import lars_r, lars_lasso_r, lightgbm_r, linear_r, omp_r, passive_aggressive_r, ransac_r, ridge_r
 from algorithms.regression import sgd_r, tweedie_r, xgboost_r
 
 from sklearn.model_selection import train_test_split

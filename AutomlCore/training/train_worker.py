@@ -19,8 +19,10 @@ class Worker(WorkerSubject):
     
   def trainModel(self):    
     self.trainer.optimizeModel()
-    score = self.trainer.getTrainedScore()
+    params, model, score = self.trainer.getTrainedResults()
     self.job.setScore(score)
+    self.job.setTrainedModel(model)
+    self.job.setParams(params)
     self.notifyObservers(self.EVENT_JOB_END)
   
   def notifyObservers(self, _event):

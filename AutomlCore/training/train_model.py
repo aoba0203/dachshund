@@ -8,6 +8,8 @@ import numpy as np
 import json
 import joblib
 from utils import definitions
+from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME
+from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST
 import datetime
 
 # outlier -> missing -> add -> scaler
@@ -20,15 +22,15 @@ class TrainModel:
     self.f_missing = feature_missing.MissingData().getMissingDataMethodList()
     self.f_outlier = feature_outlier.FeatureOutlier().getRemovedOutlierMethodList()
     self.f_scaler = feature_scaler.FeatureScaler().getFeatureScalerMethodList()
-    self.best_score = np.iinfo(np.int32).max
+    # self.best_score = np.iinfo(np.int32).max
     return
   
   def __getHyperParamsSpace(self):
     return {
-      'feature_add': hp.choice('feature_add', np.arange(len(self.f_add))),
-      'feature_missing': hp.choice('feature_missing', np.arange(len(self.f_missing))),
-      'feature_outlier': hp.choice('feature_outlier', np.arange(len(self.f_outlier))),
-      'feature_scaler': hp.choice('feature_scaler', np.arange(len(self.f_scaler))),
+      KEY_FEATURE_ADD_NAME: hp.choice(KEY_FEATURE_ADD_NAME, np.arange(len(self.f_add))),
+      KEY_FEATURE_MIS_NAME: hp.choice(KEY_FEATURE_MIS_NAME, np.arange(len(self.f_missing))),
+      KEY_FEATURE_OUT_NAME: hp.choice(KEY_FEATURE_OUT_NAME, np.arange(len(self.f_outlier))),
+      KEY_FEATURE_SCA_NAME: hp.choice(KEY_FEATURE_SCA_NAME, np.arange(len(self.f_scaler))),
       'model': self.job.model.getHyperParameterSpace(),
     }
 
@@ -49,7 +51,7 @@ class TrainModel:
   def __minizeScore(self, _params):
     train_x, train_y = self.__getPreprocessedDf(self.job.df_train, _params)
     test_x, test_y = self.__getPreprocessedDf(self.job.df_test, _params)    
-    score, trained_model = self.job.model.getScore(train_x, train_y, test_x, test_y, _params['model'])
+    score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, _params['model'])
     # if self.best_score > score:
     #   self.job.setTrainedModel(trained_model)
     return {'loss': score, 'status': STATUS_OK}
@@ -58,31 +60,50 @@ class TrainModel:
     params = self.job.model.params_list
     for key, value in zip(params.keys(), params.values()):
       v_idx = _best[key]
-      _best[key]= params[key][v_idx]
+      _best[key]= params[key][v_idx]    
+    _best[KEY_FEATURE_ADD_NAME_LIST] = self.f_add.keys()
+    _best[KEY_FEATURE_MIS_NAME_LIST] = self.f_missing.keys()
+    _best[KEY_FEATURE_OUT_NAME_LIST] = self.f_outlier.keys()
+    _best[KEY_FEATURE_SCA_NAME_LIST] = self.f_scaler.keys()
     self.__saveBestParams(_best)
   
-  # def __writeBestModel(self):
-  #   filepath = definitions.getBestModelFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
-  #   joblib.dump(self.job.trained_model, filepath)  
+  def __saveTrainedModel(self, _model):
+    filepath = definitions.getBestModelFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
+    joblib.dump(_model, filepath)  
+  
+  def __getSavedModel(self):
+    filepath = definitions.getBestModelFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
+    if not os.path.exists(filepath):
+      return None
+    else:
+      return joblib.load(filepath)
   
   def optimizeModel(self):
-    hyper_space = self.__getHyperParamsSpace()
-    max_iter = self.job.model.getMaxIterCount()
-    best = fmin(self.__minizeScore, hyper_space, algo=tpe.suggest, max_evals=max_iter)
-    # print('-optimize Model Success-')
-    self.__writeBestParams(best)
+    best_params = self.getBestParams()
+    if len(best_params) < 1:
+      print('Optimize Model: ', self.job.getJobName())
+      hyper_space = self.__getHyperParamsSpace()
+      max_iter = self.job.model.getMaxIterCount()
+      best = fmin(self.__minizeScore, hyper_space, algo=tpe.suggest, max_evals=max_iter)
+      # print('-optimize Model Success-')
+      self.__writeBestParams(best)
   
-  def getTrainedScore(self):
+  def getTrainedResults(self):
     params = self.getBestParams()
     train_x, train_y = self.__getPreprocessedDf(self.job.df_train, params)
     test_x, test_y = self.__getPreprocessedDf(self.job.df_test, params)
-    score, model = self.job.model.getScore(train_x, train_y, test_x, test_y, params, _for_optimize=False)
-    return score
+    model = self.__getSavedModel()
+    if model == None:
+      score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, params, _for_optimize=False)
+      self.__saveTrainedModel(model)
+    else:
+      score = self.job.model.getTrainedModelScore(model, test_x, test_y, _for_optimize=False)
+    return params, model, score
   
   def __saveBestParams(self, _best):
     filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
     with open(filepath, 'w') as result_file:
-      json.dump(_best, result_file, default=self.myconverter)
+      json.dump(_best, result_file, default=self.__jsonConverter)
   
   def getBestParams(self):
     filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
@@ -93,7 +114,7 @@ class TrainModel:
       return best
     return {}
 
-  def myconverter(self, obj):
+  def __jsonConverter(self, obj):
     if isinstance(obj, np.integer):
         return int(obj)
     elif isinstance(obj, np.floating):

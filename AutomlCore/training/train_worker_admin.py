@@ -1,4 +1,6 @@
 from abc import abstractclassmethod
+from dachshund.AutomlCore.build.lib.preprocess.feature_scaler import f_scaler
+from dachshund.AutomlCore.build.lib.preprocess.feature_add import f_add
 
 class WorkerObserver:
   @abstractclassmethod
@@ -16,7 +18,11 @@ from utils import utils
 import threading
 # from threading import Lock
 from multiprocessing import Lock
+from utils import definitions
+from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME
+from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST
 import queue
+import pandas as pd
 
 class WorkerAdmin(WorkerObserver):
   def __init__(self, _project_name, _df, _target_column, _model_list, _worker_count=4):
@@ -28,6 +34,7 @@ class WorkerAdmin(WorkerObserver):
     self.train_stage = 0
     self.train_model_count_list = [20, 15, 7, 5]
     self.train_data_ratio_list = [15, 30, 50, 100]
+    self.job_list = []
     self.trained_job_list = []
     self.process_dic = {}
     self.lock = Lock()
@@ -49,19 +56,19 @@ class WorkerAdmin(WorkerObserver):
       self.job_queue.put(job)
     print('makeJobQueue Stage: ' + str(self.train_stage) + ', Job Size: ' + str(self.job_queue.qsize()))
   
-  def trainModel(self, _job):
-    print('trainModel:' + _job.getJobName())
-    worker = Worker(_job)
-    worker.registerObserver(self)
-    worker.trainModel()
-    return
+  # def trainModel(self, _job):
+  #   print('trainModel:' + _job.getJobName())
+  #   worker = Worker(_job)
+  #   worker.registerObserver(self)
+  #   worker.trainModel()
+  #   return
   
   def changeWorkerCount(self, _worker_count):
     self.worker_count = _worker_count
     self.startWorkers()
   
   def startWorkers(self):
-    print('startWorkers: q = ', self.job_queue.empty(), ', p_count: ', len(self.process_dic))
+    # print('startWorkers: q = ', self.job_queue.empty(), ', p_count: ', len(self.process_dic))
     while not self.job_queue.empty():
       # if len(self.process_dic) >= self.worker_count:
       #   break;
@@ -81,25 +88,57 @@ class WorkerAdmin(WorkerObserver):
   def update(self, _event, _job, _worker):
     _worker.unregisterObserver(self)
     self.trained_job_list.append(_job)
-    job_name = _job.getJobName()        
-    proc = self.process_dic[job_name]
-    del(self.process_dic[job_name])
+    self.job_list.append(_job)
     print('Job End - ',  _job, ', stage: ', self.train_stage, ', qsize: ', self.job_queue.qsize(), ', process size: ', len(self.process_dic))
     # with self.lock:
     if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
       self.train_stage += 1
       model_list = self.__getSelectedTrainModelList()
       self.makeJobQueue(model_list)
-      self.trained_job_list = []
+      self.job_list = []
+      # self.trained_job_list = []
     self.startWorkers()
+    if (self.job_queue.qsize() == 0) & (self.train_stage == (len(self.train_data_ratio_list)-1)):
+      print('End Training.')
+      self.__makeResultDataFrame()
+
     # print('process Close()')
     # proc.close()
+
+  def __makeResultDataFrame(self):
+    modelname_list = []
+    dataratio_list = []
+    f_missing_list = []
+    f_outlier_list = []
+    f_add_list = []
+    f_scaler_List = []
+    score_list = []
+    for job in self.trained_job_list:
+      modelname_list.append(job.model.model_name)
+      dataratio_list.append(job.data_ratio)
+      f_missing_list.append(job.best_params[KEY_FEATURE_MIS_NAME_LIST][job.best_params[KEY_FEATURE_MIS_NAME]])
+      f_outlier_list.append(job.best_params[KEY_FEATURE_OUT_NAME_LIST][job.best_params[KEY_FEATURE_OUT_NAME]])
+      f_add_list.append(job.best_params[KEY_FEATURE_ADD_NAME_LIST][job.best_params[KEY_FEATURE_ADD_NAME]])
+      f_scaler_List.append(job.best_params[KEY_FEATURE_SCA_NAME_LIST][job.best_params[KEY_FEATURE_SCA_NAME]])
+      score_list.append(job.score)
+    dic_results = {
+      'model': modelname_list,
+      'data_ratio': dataratio_list,
+      KEY_FEATURE_MIS_NAME: f_missing_list,
+      KEY_FEATURE_OUT_NAME: f_outlier_list,
+      KEY_FEATURE_ADD_NAME: f_add_list,
+      KEY_FEATURE_SCA_NAME: f_scaler_List,
+      'score': score_list,
+    }
+    df_results = pd.DataFrame(dic_results)
+    file_results = definitions.getResultsFilePath(self.project_name)
+    df_results.to_csv(file_results, index=False)
 
   def __getSelectedTrainModelList(self):
     model_list = []
     model_count = self.train_model_count_list[self.train_stage]
-    self.trained_job_list.sort(key=lambda job:job.score)
-    for idx, job in enumerate(self.trained_job_list):
+    self.job_list.sort(key=lambda job:job.score)
+    for idx, job in enumerate(self.job_list):
       print(job)
       if idx == (model_count):
         break

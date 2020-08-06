@@ -3,6 +3,15 @@ import numpy as np
 from pathlib import Path
 import multiprocessing
 
+KEY_FEATURE_ADD_NAME = 'feature_add'
+KEY_FEATURE_MIS_NAME = 'feature_missing'
+KEY_FEATURE_OUT_NAME = 'feature_outlier'
+KEY_FEATURE_SCA_NAME = 'feature_scaler'
+KEY_FEATURE_ADD_NAME_LIST = 'feature_add_name'
+KEY_FEATURE_MIS_NAME_LIST = 'feature_missing_name'
+KEY_FEATURE_OUT_NAME_LIST = 'feature_outlier_name'
+KEY_FEATURE_SCA_NAME_LIST = 'feature_scaler_name'
+
 def getProjectRootPath():
   file = Path(os.path.abspath('utils.py'))
   parent= file.parent
@@ -35,6 +44,11 @@ def getBestModelParamsFilePath(_project_name, _model_name, _data_ratio):
 
 def getBestModelFilePath(_project_name, _model_name, _data_ratio):
   return __getBestModelFilePath(_project_name, _model_name, _data_ratio, '.joblib')
+
+def getResultsFilePath(_project_name):
+  project_path = getProjectResultsPath(_project_name)
+  filename = 'automl_' + _project_name + '.csv'
+  return os.path.join(project_path, filename)
 
 def getNumberOfCore():
   cpuCount = multiprocessing.cpu_count()

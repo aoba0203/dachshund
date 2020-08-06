@@ -6,7 +6,7 @@ class ModelRegression:
     model = self.getModel(_params)
     model.fit(_x, _y)
     pred = model.predict(_x_eval)    
-    return mean_absolute_error(_y_eval, pred), model
+    return mean_absolute_error(_y_eval, pred)
 
   def getTrainedModelScore(self, _model, _x_eval, _y_eval, _for_optimize=True, scorer=mean_absolute_error):    
     pred = _model.predict(_x_eval)    
