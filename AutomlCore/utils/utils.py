@@ -22,10 +22,10 @@ def splitDateColumns(_df):
   date_column_list = getDateColumnList(_df)
   for column in date_column_list:
     df_local = pd.to_datetime(_df[column])
-    if len(pd.unique(df_local.dt.year)) > 1:
-      _df[column + '_year'] = df_local.dt.year
-    if len(pd.unique(df_local.dt.month)) > 1:
-      _df[column + '_month'] = df_local.dt.month
+    # if len(pd.unique(df_local.dt.year)) > 1:
+    _df[column + '_year'] = df_local.dt.year
+    # if len(pd.unique(df_local.dt.month)) > 1:
+    _df[column + '_month'] = df_local.dt.month
     if len(pd.unique(df_local.dt.day)) > 1:
       _df[column + '_day'] = df_local.dt.day
     if len(pd.unique(df_local.dt.hour)) > 1:

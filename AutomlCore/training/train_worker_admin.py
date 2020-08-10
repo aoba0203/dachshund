@@ -23,22 +23,22 @@ import queue
 import pandas as pd
 
 class WorkerAdmin(WorkerObserver):
-  def __init__(self, _project_name, _df, _target_column, _model_list, _worker_count=4):
+  def __init__(self, _project_name, _df, _target_column, _ensemble_model_list, _worker_count=4):
     self.project_name = _project_name
     self.df = _df
     self.target_column = _target_column
-    self.model_list = _model_list    
+    self.ensemble_model_list =_ensemble_model_list
     self.worker_count = _worker_count
     self.train_stage = 0
     self.train_model_count_list = [20, 10, 7, 5, 3]
-    self.train_data_ratio_list = [15, 30, 40, 50, 100]
+    self.train_data_ratio_list = [15, 30, 40, 50, 100, 100]
     self.job_list = []
     self.trained_job_list = []
     self.process_dic = {}
     self.lock = Lock()
     self.job_queue = queue.Queue()
     self.__initDataProcess()
-    self.train, self.test = train_test_split(self.df, test_size=0.1)
+    self.train, self.test = train_test_split(self.df, test_size=0.2)
     return  
   
   def __initDataProcess(self):
@@ -54,6 +54,14 @@ class WorkerAdmin(WorkerObserver):
       self.job_queue.put(job)
     print('makeJobQueue Stage: ' + str(self.train_stage) + ', Job Size: ' + str(self.job_queue.qsize()))
   
+  def __makeEnsembleJob(self, _candiate_job_list):
+    model_list = []
+    for model in self._ensemble_model_list:
+      model.setCandidateJobList(_candiate_job_list)
+      model_list.append(model)
+    self.makeJobQueue(model_list)
+    return 
+
   # def trainModel(self, _job):
   #   print('trainModel:' + _job.getJobName())
   #   worker = Worker(_job)
@@ -89,20 +97,26 @@ class WorkerAdmin(WorkerObserver):
     self.job_list.append(_job)
     print('Job End - ',  _job, ', stage: ', self.train_stage, ', qsize: ', self.job_queue.qsize(), ', process size: ', len(self.process_dic))
     # with self.lock:
-    if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
-      self.train_stage += 1
-      model_list = self.__getSelectedTrainModelList()
-      self.makeJobQueue(model_list)
-      self.job_list = []
+    # if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
+    if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0):
+      if self.train_stage < (len(self.train_data_ratio_list)-1):
+        self.train_stage += 1
+        model_list = self.__getSelectedTrainModelList()
+        self.makeJobQueue(model_list)
+        self.job_list = []
+      elif (self.train_stage == (len(self.train_data_ratio_list)-1)):
+        self.train_stage += 1
+        print('make Ensemble job')
+        self.__makeEnsembleJob()
       # self.trained_job_list = []
     self.startWorkers()
-    if (self.job_queue.qsize() == 0) & (self.train_stage == (len(self.train_data_ratio_list)-1)):
-      print('End Training.')
+    if (self.job_queue.qsize() == 0) & (self.train_stage == (len(self.train_data_ratio_list))):
+      print('End Ensemble.')
       self.__makeResultDataFrame()
 
     # print('process Close()')
     # proc.close()
-
+      
   def __makeResultDataFrame(self):
     modelname_list = []
     dataratio_list = []
@@ -114,7 +128,6 @@ class WorkerAdmin(WorkerObserver):
     for job in self.trained_job_list:
       modelname_list.append(job.model.model_name)
       dataratio_list.append(job.data_ratio)
-      print(job.best_params)
       f_missing_list.append(job.best_params[KEY_FEATURE_MIS_NAME_LIST][job.best_params[KEY_FEATURE_MIS_NAME]])
       f_outlier_list.append(job.best_params[KEY_FEATURE_OUT_NAME_LIST][job.best_params[KEY_FEATURE_OUT_NAME]])
       f_add_list.append(job.best_params[KEY_FEATURE_ADD_NAME_LIST][job.best_params[KEY_FEATURE_ADD_NAME]])
@@ -143,3 +156,5 @@ class WorkerAdmin(WorkerObserver):
         break
       model_list.append(job.model)
     return model_list
+
+

@@ -34,42 +34,45 @@ class FeatureOutlier():
   def __getRemovedOutlierNoneDf(self, _df):
     return _df
 
-  def __getRemoveOutlierDf(self, _df, _algorithm):    
+  def __getRemoveOutlierDf(self, _df, _algorithm, _column_drop=True):    
     df = self.__getDroppedColumnDf(_df.copy())
     pred = _algorithm.fit_predict(df)
     df[self.column_name_outlier] = pred
     df = df[df[self.column_name_outlier] == 1]
+    if _column_drop:
+      df = df.drop(self.column_name_outlier, axis=1)
     return df
   
-  def __getRemovedOutlierRobustDf(self, _df):    
+  def __getRemovedOutlierRobustDf(self, _df, _column_drop=True):    
     robust = EllipticEnvelope(contamination=OUTLIER_FRACTION)
-    return self.__getRemoveOutlierDf(_df, robust)
+    return self.__getRemoveOutlierDf(_df, robust, _column_drop)
 
   # def __getRemovedOutlierOneClassSvmDf(self):
   #   filename = 'preprocess_outlier_oneclass_svm.csv'
   #   ocsvm = svm.OneClassSVM(nu=OUTLIER_FRACTION)
   #   return self.__getRemoveOutlierDf(filename, ocsvm)
 
-  def __getRemovedOutlierIsolationForestDf(self, _df):
+  def __getRemovedOutlierIsolationForestDf(self, _df, _column_drop=True):
     iForest = IsolationForest(contamination=OUTLIER_FRACTION, n_jobs=definitions.getNumberOfCore())
-    return self.__getRemoveOutlierDf(_df, iForest)
+    return self.__getRemoveOutlierDf(_df, iForest, _column_drop)
   
-  def __getRemovedOutlierLocalFactorDf(self, _df):
+  def __getRemovedOutlierLocalFactorDf(self, _df, _column_drop=True):
     localFactor = LocalOutlierFactor(contamination=OUTLIER_FRACTION, n_jobs=definitions.getNumberOfCore())
-    return self.__getRemoveOutlierDf(_df, localFactor)
+    return self.__getRemoveOutlierDf(_df, localFactor, _column_drop)
   
   def __getRemovedOutlierIntersectionDf(self, _df):
     df = _df.copy()
-    df[self.column_name_robust] = self.__getRemovedOutlierRobustDf(_df)[self.column_name_outlier]
+    df[self.column_name_robust] = self.__getRemovedOutlierRobustDf(_df, _column_drop=False)[self.column_name_outlier]
     # df[self.column_name_ocsvm] = self.__getRemovedOutlierOneClassSvmDf()[self.column_name_outlier]
-    df[self.column_name_iforest] = self.__getRemovedOutlierIsolationForestDf(_df)[self.column_name_outlier]
-    df[self.column_name_localfactor] = self.__getRemovedOutlierLocalFactorDf(_df)[self.column_name_outlier]
+    df[self.column_name_iforest] = self.__getRemovedOutlierIsolationForestDf(_df, _column_drop=False)[self.column_name_outlier]
+    df[self.column_name_localfactor] = self.__getRemovedOutlierLocalFactorDf(_df, _column_drop=False)[self.column_name_outlier]
     df_outlier = df[
       (df[self.column_name_robust] == 1) & 
       # (df[self.column_name_ocsvm] == 1) & 
       (df[self.column_name_iforest] == 1) &
       (df[self.column_name_localfactor] == 1)
     ]
+    df_outlier = df_outlier.drop([self.column_name_robust, self.column_name_iforest, self.column_name_localfactor], axis=1)
     return df_outlier
 
   def getRemovedOutlierMethodList(self):

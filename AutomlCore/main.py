@@ -25,7 +25,7 @@ if __name__ == '__main__':
   outliers.makeDataframeHtmlFile()
 
   df = pd.read_csv(path_train_file)
-  df = df.sample(int(len(df) * 0.05))
+  # df = df.sample(int(len(df) * 0.5))
   t = TrainManager(TrainManager.PROBLEM_TYPE_REGRESSION, 'testPjt', df, 'Sales')
   t.startWorkerAdmin()
 #%%

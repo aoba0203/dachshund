@@ -8,6 +8,8 @@ from algorithms.regression import ard_regression_r, bayesian_ridge_r, elasticnet
 from algorithms.regression import lars_r, lars_lasso_r, lightgbm_r, linear_r, omp_r, passive_aggressive_r, ransac_r, ridge_r
 from algorithms.regression import sgd_r, tweedie_r, xgboost_r
 
+from algorithms.ensemble import stacking_c, stacking_r, voting_c, voting_r
+
 from sklearn.model_selection import train_test_split
 from .train_job import Job
 from .train_worker_admin import WorkerAdmin
@@ -24,15 +26,17 @@ class TrainManager:
     self.df = _df
     self.target_column = _target_column
     self.model_list = []
+    self.ensemble_model_list = []
+    self.worker_admin = None
     self.__setModelList()
     return
   
   def startWorkerAdmin(self):
-    worker_admin = WorkerAdmin(self.project_name, self.df, self.target_column, self.model_list)
-    worker_admin.makeJobQueue(self.model_list)
+    self.worker_admin = WorkerAdmin(self.project_name, self.df, self.ensemble_model_list, self.target_column)
+    self.worker_admin.makeJobQueue(self.model_list)
     for model in self.model_list:
       print(model.model_name)
-    worker_admin.startWorkers()
+    self.worker_admin.startWorkers()
     return
   
   def stopWorkerAdmin(self):
@@ -56,11 +60,13 @@ class TrainManager:
       self.model_list.append(xgboost_c.XgboostClassifier(self.project_name))
       self.model_list.append(tree_decision_c.DecisionTreeClassifier(self.project_name))
       self.model_list.append(nearest_centroid_c.NearestCentroidClassifier(self.project_name))
-      self.model_list.append(neural_network_c.NeuralNetworkClassifier(self.project_name))
+      # self.model_list.append(neural_network_c.NeuralNetworkClassifier(self.project_name))
       self.model_list.append(sgd_c.SgdClassifier(self.project_name))
       self.model_list.append(nusvc_c.NuSvcClassifier(self.project_name))
       self.model_list.append(svc_c.SvcClassifier(self.project_name))
       self.model_list.append(svc_linear_c.SvcLinearClassifier(self.project_name))
+      self.ensemble_model_list.append(stacking_c.StackingClassifier(self.project_name))
+      self.ensemble_model_list.append(voting_c.VotingClassifier(self.project_name))
     elif self.problem_type == TrainManager.PROBLEM_TYPE_REGRESSION:
       self.model_list.append(ard_regression_r.ARDRegressor(self.project_name))
       self.model_list.append(bayesian_ridge_r.BayesianRidgeRegressor(self.project_name))
@@ -82,6 +88,8 @@ class TrainManager:
       self.model_list.append(sgd_r.SgdRegressor(self.project_name))
       self.model_list.append(tweedie_r.TweedieRegressor(self.project_name))
       self.model_list.append(xgboost_r.XgboostRegressor(self.project_name))
+      self.ensemble_model_list.append(stacking_r.StackingRegressor(self.project_name))
+      self.ensemble_model_list.append(voting_r.VotingRegressor(self.project_name))
 
   # def optimizeModel(self):
   #   # df = self.df.sample(int(len(self.df) * 0.5))
