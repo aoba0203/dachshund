@@ -34,7 +34,7 @@ class TrainModel:
       KEY_FEATURE_OUT_NAME: hp.choice(KEY_FEATURE_OUT_NAME, np.arange(len(self.f_outlier))),
       KEY_FEATURE_SCA_NAME: hp.choice(KEY_FEATURE_SCA_NAME, np.arange(len(self.f_scaler))),
       KEY_FEATURE_SEL_NAME: hp.choice(KEY_FEATURE_SEL_NAME, np.arange(len(self.f_selection))),
-      KEY_FEATURE_SEL_RATE_NAME: hp.choice(KEY_FEATURE_SEL_RATE_NAME, self.feature_selection_list),
+      KEY_FEATURE_SEL_RATE_NAME: hp.quniform(KEY_FEATURE_SEL_RATE_NAME, 0.5, 0.9, 0.1),
       'model': self.job.model.getHyperParameterSpace(),
     }
 
@@ -45,7 +45,7 @@ class TrainModel:
     df = (list(self.f_add.values())[_params[KEY_FEATURE_ADD_NAME]])(df)    
     x, y = self.__splitXy(df)
     x = (list(self.f_scaler.values())[_params[KEY_FEATURE_SCA_NAME]])(x)
-    x = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, [_params[KEY_FEATURE_SEL_RATE_NAME]])
+    x = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, _params[KEY_FEATURE_SEL_RATE_NAME])
     return x, y
 
   def __splitXy(self, _df):

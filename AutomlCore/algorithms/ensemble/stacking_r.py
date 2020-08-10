@@ -14,6 +14,7 @@ class StackingRegressor(model.Model, model_regression.ModelRegression):
 
   def setCandidateJobList(self, _jobs):
     self.cantidate_job_list = _jobs
+    self.cantidate_job_list.sort(key = lambda element : element.score)
 
   def getHyperParameterSpace(self):
     return {
