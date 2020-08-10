@@ -1,5 +1,6 @@
 class Job:
-  def __init__(self, _project_name, _data_ratio, _train_df, _test_df, _target_column, _model):
+  def __init__(self, _problem_type, _project_name, _data_ratio, _train_df, _test_df, _target_column, _model):
+    self.problem_type = _problem_type
     self.project_name = _project_name
     self.data_ratio = _data_ratio
     self.df_train = _train_df

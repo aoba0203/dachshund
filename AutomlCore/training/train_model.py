@@ -1,6 +1,6 @@
 import pickle
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
-from preprocess import feature_add, feature_missing, feature_outlier, feature_scaler
+from preprocess import feature_add, feature_missing, feature_outlier, feature_scaler, feature_selection
 import pickle
 import os
 from sklearn.linear_model import Lars
@@ -8,8 +8,8 @@ import numpy as np
 import json
 import joblib
 from utils import definitions
-from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME
-from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST
+from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
+from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST
 import datetime
 
 # outlier -> missing -> add -> scaler
@@ -22,6 +22,8 @@ class TrainModel:
     self.f_missing = feature_missing.MissingData().getMissingDataMethodList()
     self.f_outlier = feature_outlier.FeatureOutlier().getRemovedOutlierMethodList()
     self.f_scaler = feature_scaler.FeatureScaler().getFeatureScalerMethodList()
+    self.f_selection = feature_selection.FeatureSelection(_job.problem_type).getFeatureSelectionMethodList()
+    self.feature_selection_list = [0.5, 0.7, 0.8, 0.9]
     # self.best_score = np.iinfo(np.int32).max
     return
   
@@ -31,16 +33,19 @@ class TrainModel:
       KEY_FEATURE_MIS_NAME: hp.choice(KEY_FEATURE_MIS_NAME, np.arange(len(self.f_missing))),
       KEY_FEATURE_OUT_NAME: hp.choice(KEY_FEATURE_OUT_NAME, np.arange(len(self.f_outlier))),
       KEY_FEATURE_SCA_NAME: hp.choice(KEY_FEATURE_SCA_NAME, np.arange(len(self.f_scaler))),
+      KEY_FEATURE_SEL_NAME: hp.choice(KEY_FEATURE_SEL_NAME, np.arange(len(self.f_selection))),
+      KEY_FEATURE_SEL_RATE_NAME: hp.choice(KEY_FEATURE_SEL_RATE_NAME, self.feature_selection_list),
       'model': self.job.model.getHyperParameterSpace(),
     }
 
   def __getPreprocessedDf(self, _df, _params):
     df = _df.copy()
-    df = (list(self.f_missing.values())[_params['feature_missing']])(df)
-    df = (list(self.f_outlier.values())[_params['feature_outlier']])(df)
-    df = (list(self.f_add.values())[_params['feature_add']])(df)    
+    df = (list(self.f_missing.values())[_params[KEY_FEATURE_MIS_NAME]])(df)
+    df = (list(self.f_outlier.values())[_params[KEY_FEATURE_OUT_NAME]])(df)
+    df = (list(self.f_add.values())[_params[KEY_FEATURE_ADD_NAME]])(df)    
     x, y = self.__splitXy(df)
-    x = (list(self.f_scaler.values())[_params['feature_scaler']])(x)
+    x = (list(self.f_scaler.values())[_params[KEY_FEATURE_SCA_NAME]])(x)
+    x = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, [_params[KEY_FEATURE_SEL_RATE_NAME]])
     return x, y
 
   def __splitXy(self, _df):
@@ -65,6 +70,7 @@ class TrainModel:
     _best[KEY_FEATURE_MIS_NAME_LIST] = list(self.f_missing.keys())
     _best[KEY_FEATURE_OUT_NAME_LIST] = list(self.f_outlier.keys())
     _best[KEY_FEATURE_SCA_NAME_LIST] = list(self.f_scaler.keys())
+    _best[KEY_FEATURE_SEL_NAME_LIST] = list(self.f_selection.keys())
     self.__saveBestParams(_best)
   
   def __saveTrainedModel(self, _model):

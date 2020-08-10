@@ -13,13 +13,10 @@ from algorithms.ensemble import stacking_c, stacking_r, voting_c, voting_r
 from sklearn.model_selection import train_test_split
 from .train_job import Job
 from .train_worker_admin import WorkerAdmin
-from utils import utils
+from utils import utils, definitions
 import json
 
 class TrainManager:
-  PROBLEM_TYPE_CLASSIFICATION = 0
-  PROBLEM_TYPE_REGRESSION = 1
-
   def __init__(self, _problem_type, _project_name, _df, _target_column):
     self.problem_type = _problem_type
     self.project_name = _project_name
@@ -32,7 +29,7 @@ class TrainManager:
     return
   
   def startWorkerAdmin(self):
-    self.worker_admin = WorkerAdmin(self.project_name, self.df, self.ensemble_model_list, self.target_column)
+    self.worker_admin = WorkerAdmin(self.problem_type, self.project_name, self.df, self.target_column, self.ensemble_model_list)
     self.worker_admin.makeJobQueue(self.model_list)
     for model in self.model_list:
       print(model.model_name)
@@ -44,7 +41,7 @@ class TrainManager:
   
   def __setModelList(self):
     self.model_list = []
-    if self.problem_type == TrainManager.PROBLEM_TYPE_CLASSIFICATION:
+    if self.problem_type == definitions.PROBLEM_TYPE_CLASSIFICATION:
       self.model_list.append(ensemble_adaboost_c.AdaBoostClassifier(self.project_name))
       self.model_list.append(ensemble_extra_tree_c.ExtraTreesClassifier(self.project_name))
       self.model_list.append(ensemble_gradient_boosting_c.GradientBoostingClassifier(self.project_name))
@@ -67,7 +64,7 @@ class TrainManager:
       self.model_list.append(svc_linear_c.SvcLinearClassifier(self.project_name))
       self.ensemble_model_list.append(stacking_c.StackingClassifier(self.project_name))
       self.ensemble_model_list.append(voting_c.VotingClassifier(self.project_name))
-    elif self.problem_type == TrainManager.PROBLEM_TYPE_REGRESSION:
+    elif self.problem_type == definitions.PROBLEM_TYPE_REGRESSION:
       self.model_list.append(ard_regression_r.ARDRegressor(self.project_name))
       self.model_list.append(bayesian_ridge_r.BayesianRidgeRegressor(self.project_name))
       self.model_list.append(elasticnet_r.ElasticNetRegressor(self.project_name))

@@ -3,14 +3,20 @@ import numpy as np
 from pathlib import Path
 import multiprocessing
 
+PROBLEM_TYPE_CLASSIFICATION = 0
+PROBLEM_TYPE_REGRESSION = 1
+
 KEY_FEATURE_ADD_NAME = 'feature_add'
 KEY_FEATURE_MIS_NAME = 'feature_missing'
 KEY_FEATURE_OUT_NAME = 'feature_outlier'
 KEY_FEATURE_SCA_NAME = 'feature_scaler'
+KEY_FEATURE_SEL_NAME = 'feature_selection'
+KEY_FEATURE_SEL_RATE_NAME = 'feature_selection_rate'
 KEY_FEATURE_ADD_NAME_LIST = 'feature_add_name'
 KEY_FEATURE_MIS_NAME_LIST = 'feature_missing_name'
 KEY_FEATURE_OUT_NAME_LIST = 'feature_outlier_name'
 KEY_FEATURE_SCA_NAME_LIST = 'feature_scaler_name'
+KEY_FEATURE_SEL_NAME_LIST = 'feature_selection_name'
 
 def getProjectRootPath():
   file = Path(os.path.abspath('utils.py'))

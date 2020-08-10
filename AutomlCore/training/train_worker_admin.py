@@ -23,7 +23,8 @@ import queue
 import pandas as pd
 
 class WorkerAdmin(WorkerObserver):
-  def __init__(self, _project_name, _df, _target_column, _ensemble_model_list, _worker_count=4):
+  def __init__(self, _problem_type, _project_name, _df, _target_column, _ensemble_model_list, _worker_count=4):
+    self.problem_type = _problem_type
     self.project_name = _project_name
     self.df = _df
     self.target_column = _target_column
@@ -50,7 +51,7 @@ class WorkerAdmin(WorkerObserver):
     ratio = self.train_data_ratio_list[self.train_stage]
     train = self.train.sample(int(len(self.train) * (ratio * 0.01)))
     for model in _model_list:
-      job = Job(self.project_name, ratio, train, self.test, self.target_column, model)
+      job = Job(self.problem_type, self.project_name, ratio, train, self.test, self.target_column, model)
       self.job_queue.put(job)
     print('makeJobQueue Stage: ' + str(self.train_stage) + ', Job Size: ' + str(self.job_queue.qsize()))
   
@@ -99,12 +100,12 @@ class WorkerAdmin(WorkerObserver):
     # with self.lock:
     # if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
     if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0):
-      if self.train_stage < (len(self.train_data_ratio_list)-1):
+      if self.train_stage < (len(self.train_data_ratio_list)-2):
         self.train_stage += 1
         model_list = self.__getSelectedTrainModelList()
         self.makeJobQueue(model_list)
         self.job_list = []
-      elif (self.train_stage == (len(self.train_data_ratio_list)-1)):
+      elif (self.train_stage == (len(self.train_data_ratio_list)-2)):
         self.train_stage += 1
         print('make Ensemble job')
         self.__makeEnsembleJob()

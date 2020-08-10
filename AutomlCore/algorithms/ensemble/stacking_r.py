@@ -1,4 +1,3 @@
-from dachshund.AutomlCore.training.train_job import Job
 from sklearn.ensemble import StackingRegressor as Stacking
 from utils import definitions
 from .. import model, model_regression
