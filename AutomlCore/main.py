@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
   df = pd.read_csv(path_train_file)
   # df = df.sample(int(len(df) * 0.5))
-  t = TrainManager(TrainManager.PROBLEM_TYPE_REGRESSION, 'testPjt', df, 'Sales')
+  t = TrainManager(definitions.PROBLEM_TYPE_REGRESSION, 'testPjt', df, 'Sales')
   t.startWorkerAdmin()
 #%%
 # dic = {'copy_X': 1, 'eps': 0.34864529240750924, 'feature_add': 0, 'feature_missing': 4, 'feature_outlier': 4, 'feature_scaler': 2, 'fit_intercept': 0, 'normalize': 0}

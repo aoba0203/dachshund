@@ -58,7 +58,7 @@ class FeatureSelection:
     elif self.problem_type == definitions.PROBLEM_TYPE_REGRESSION:
       estimator = XGBRegressor()
     selector = RFE(estimator, n_features_to_select=column_count).fit(df, _y)
-    column = np.array(_df.columns)
+    column = np.array(df.columns)
     new_columns = column[np.where(selector.ranking_ == 1, True, False)]
     new_x = selector.transform(df)
     return new_x
