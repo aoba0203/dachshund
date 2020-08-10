@@ -17,8 +17,8 @@ import threading
 # from threading import Lock
 from multiprocessing import Lock
 from utils import definitions
-from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME
-from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST
+from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
+from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST
 import queue
 import pandas as pd
 
@@ -125,6 +125,8 @@ class WorkerAdmin(WorkerObserver):
     f_outlier_list = []
     f_add_list = []
     f_scaler_List = []
+    f_selection_list = []
+    f_select_rate = []
     score_list = []
     for job in self.trained_job_list:
       modelname_list.append(job.model.model_name)
@@ -133,6 +135,8 @@ class WorkerAdmin(WorkerObserver):
       f_outlier_list.append(job.best_params[KEY_FEATURE_OUT_NAME_LIST][job.best_params[KEY_FEATURE_OUT_NAME]])
       f_add_list.append(job.best_params[KEY_FEATURE_ADD_NAME_LIST][job.best_params[KEY_FEATURE_ADD_NAME]])
       f_scaler_List.append(job.best_params[KEY_FEATURE_SCA_NAME_LIST][job.best_params[KEY_FEATURE_SCA_NAME]])
+      f_selection_list.append(job.best_params[KEY_FEATURE_SEL_NAME_LIST][job.best_params[KEY_FEATURE_SEL_NAME]])
+      f_select_rate.append(job.best_params[KEY_FEATURE_SEL_RATE_NAME])
       score_list.append(job.score)
     dic_results = {
       'model': modelname_list,
@@ -141,6 +145,7 @@ class WorkerAdmin(WorkerObserver):
       KEY_FEATURE_OUT_NAME: f_outlier_list,
       KEY_FEATURE_ADD_NAME: f_add_list,
       KEY_FEATURE_SCA_NAME: f_scaler_List,
+      KEY_FEATURE_SEL_NAME: f_selection_list,
       'score': score_list,
     }
     df_results = pd.DataFrame(dic_results)

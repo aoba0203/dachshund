@@ -16,7 +16,15 @@ class FeatureSelection:
   def __init__(self, _problem_type):
     self.problem_type = _problem_type
   
-  def __getSelectedNoneDf(self, _df, _ratio):
+  def __getDroppedColumnDf(self, _df):
+    drop_column_list = []
+    for column, dtype in zip(_df.columns, _df.dtypes):
+      if (dtype != 'int64') and (dtype != 'float64'):
+        drop_column_list.append(column)
+    _df = _df.drop(drop_column_list, axis=1)
+    return _df
+  
+  def __getSelectedNoneDf(self, _df, _y, _ratio):
     return _df
 
   def __getSelectedVarianceThreshold(self, _df, _y, _ratio):
