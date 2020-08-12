@@ -57,7 +57,7 @@ class WorkerAdmin(WorkerObserver):
   
   def __makeEnsembleJob(self, _candiate_job_list):
     model_list = []
-    for model in self._ensemble_model_list:
+    for model in self.ensemble_model_list:
       model.setCandidateJobList(_candiate_job_list)
       model_list.append(model)
     self.makeJobQueue(model_list)

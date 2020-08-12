@@ -23,7 +23,7 @@ class VotingRegressor(model.Model, model_regression.ModelRegression):
     for idx, job in enumerate(self.cantidate_job_list):
       if idx == _params['max_estimator']:
         break
-      estimator_list.append(job.model.model_name, job.trained_model)
+      estimator_list.append((job.model.model_name, job.trained_model))
     return Voting(
       estimators=estimator_list,
       verbosity = 0,
