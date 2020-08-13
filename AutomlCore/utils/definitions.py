@@ -17,6 +17,7 @@ KEY_FEATURE_MIS_NAME_LIST = 'feature_missing_name'
 KEY_FEATURE_OUT_NAME_LIST = 'feature_outlier_name'
 KEY_FEATURE_SCA_NAME_LIST = 'feature_scaler_name'
 KEY_FEATURE_SEL_NAME_LIST = 'feature_selection_name'
+KEY_FEATURE_SEL_COL_LIST = 'feature_selection_columns'
 
 def getProjectRootPath():
   file = Path(os.path.abspath('utils.py'))

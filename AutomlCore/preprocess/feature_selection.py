@@ -25,7 +25,7 @@ class FeatureSelection:
     return _df
   
   def __getSelectedNoneDf(self, _df, _y, _ratio):
-    return _df
+    return _df, _df.columns
 
   # def __getSelectedVarianceThreshold(self, _df, _y, _ratio):
   #   df = self.__getDroppedColumnDf(_df.copy())
@@ -61,13 +61,13 @@ class FeatureSelection:
     column = np.array(df.columns)
     new_columns = column[np.where(selector.ranking_ == 1, True, False)]
     new_x = selector.transform(df)
-    return new_x
+    return new_x, new_columns
 
   def getFeatureSelectionMethodList(self):    
     return {
       'None': self.__getSelectedNoneDf,
       # 'VarianceThreshold': self.__getSelectedVarianceThreshold,
-      'Univariate': self.__getSelectedUnivariate,
+      # 'Univariate': self.__getSelectedUnivariate,
       'RFE': self.__getSelectedRecursiveFeatureElimination,
     }
 

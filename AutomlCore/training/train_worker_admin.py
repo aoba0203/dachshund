@@ -111,7 +111,7 @@ class WorkerAdmin(WorkerObserver):
         self.__makeEnsembleJob(self.trained_job_list)
       # self.trained_job_list = []
     self.startWorkers()
-    if (self.job_queue.qsize() == 0) & (self.train_stage == (len(self.train_data_ratio_list))):
+    if (self.job_queue.qsize() == 0) & (self.train_stage == (len(self.train_data_ratio_list) -1)):
       print('End Ensemble.')
       self.__makeResultDataFrame()
 

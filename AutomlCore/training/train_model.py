@@ -9,7 +9,7 @@ import json
 import joblib
 from utils import definitions
 from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
-from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST
+from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST, KEY_FEATURE_SEL_COL_LIST
 import datetime
 
 # outlier -> missing -> add -> scaler
@@ -38,15 +38,20 @@ class TrainModel:
       'model': self.job.model.getHyperParameterSpace(),
     }
 
-  def __getPreprocessedDf(self, _df, _params):
+  def __getPreprocessedDf(self, _df, _params, _column_list=None):
     df = _df.copy()
     df = (list(self.f_missing.values())[_params[KEY_FEATURE_MIS_NAME]])(df)
     df = (list(self.f_outlier.values())[_params[KEY_FEATURE_OUT_NAME]])(df)
     df = (list(self.f_add.values())[_params[KEY_FEATURE_ADD_NAME]])(df)    
     x, y = self.__splitXy(df)
-    x = (list(self.f_scaler.values())[_params[KEY_FEATURE_SCA_NAME]])(x)
-    x = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, _params[KEY_FEATURE_SEL_RATE_NAME])
-    return x, y
+    x = (list(self.f_scaler.values())[_params[KEY_FEATURE_SCA_NAME]])(x)    
+    if _column_list:
+      x = x[_column_list]
+      return x, y, _column_list
+    else:
+      x, columns = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, _params[KEY_FEATURE_SEL_RATE_NAME])
+      return x, y, columns
+      
 
   def __splitXy(self, _df):
     y = _df[[self.job.target_column]]
@@ -54,8 +59,8 @@ class TrainModel:
     return x, y
   
   def __minizeScore(self, _params):
-    train_x, train_y = self.__getPreprocessedDf(self.job.df_train, _params)
-    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, _params)
+    train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, _params)
+    test_x, test_y, test_columns = self.__getPreprocessedDf(self.job.df_test, _params, train_columns)
     score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, _params['model'])
     # if self.best_score > score:
     #   self.job.setTrainedModel(trained_model)
@@ -96,8 +101,10 @@ class TrainModel:
   
   def getTrainedResults(self):
     params = self.getBestParams()
-    train_x, train_y = self.__getPreprocessedDf(self.job.df_train, params)
-    test_x, test_y = self.__getPreprocessedDf(self.job.df_test, params)
+    train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, params)
+    test_x, test_y, test_columns = self.__getPreprocessedDf(self.job.df_test, params, train_columns)
+    params[KEY_FEATURE_SEL_COL_LIST] = train_columns
+    self.__saveBestParams(params)
     model = self.__getSavedModel()
     if model == None:
       score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, params, _for_optimize=False)

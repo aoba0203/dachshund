@@ -27,12 +27,12 @@ class VotingClassifier(model.Model, model_classification.ModelClassification):
     for idx, job in enumerate(self.cantidate_job_list):
       if idx == _params['max_estimator']:
         break
-      estimator_list.append(job.model.model_name, job.trained_model)
+      estimator_list.append((job.model.getJobName(), job.trained_model))
     return Voting(
       estimators=estimator_list,
       voting=_params['voting'],
       flatten_transform= bool(_params['flatten_transform']),
-      verbosity = 0,
+      # verbosity = 0,
       n_jobs= definitions.getNumberOfCore(),
     )
     

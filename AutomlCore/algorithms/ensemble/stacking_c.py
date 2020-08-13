@@ -6,7 +6,7 @@ from hyperopt import hp
 class StackingClassifier(model.Model, model_regression.ModelRegression):
   def __init__(self, _project_name):
     super().__init__(_project_name)
-    self.model_name = 'StackingRegressor'
+    self.model_name = 'StackingClassifier'
     # self.cantidate_job_list = _candidate_job_list
     self.params_list = {}
 
@@ -24,10 +24,10 @@ class StackingClassifier(model.Model, model_regression.ModelRegression):
     for idx, job in enumerate(self.cantidate_job_list):
       if idx == _params['max_estimator']:
         break
-      estimator_list.append(job.model.model_name, job.trained_model)
+      estimator_list.append((job.model.getJobName(), job.trained_model))
     return Stacking(
       estimators=estimator_list,
-      verbosity = 0,
+      # verbosity = 0,
       passthrough= _params['passthrough'],
       n_jobs= definitions.getNumberOfCore(),
     )
