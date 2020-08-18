@@ -12,6 +12,7 @@ from eda import de_pdprofiling, df_outlier
 from training.train_manager import TrainManager
 #%%
 import warnings
+import project
  
 warnings.filterwarnings("ignore")
 #%%

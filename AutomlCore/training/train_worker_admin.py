@@ -21,7 +21,7 @@ from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FE
 from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST
 import queue
 import pandas as pd
-from .. import project
+import project
 
 class WorkerAdmin(WorkerObserver):
   def __init__(self, _problem_type, _project_name, _df, _target_column, _ensemble_model_list, _worker_count=4):
@@ -123,10 +123,12 @@ class WorkerAdmin(WorkerObserver):
     if (self.job_best):
       if self.job_best.score > _job.score:
         self.job_best = _job
-        info = project.ProjectMetaInfo(self.job_best.project_name, self.job_best.problem_type, self.job_best.model.metrics_name, self.job_best.score)
-        info_dic = info.getDictionary()
-        filepath = definitions.getProejctInfoFilePath(self.job_best.project_name)
-        utils.writeJsonToFile(info_dic, filepath)
+    else:
+      self.job_best = _job
+    info = project.ProjectMetaInfo(self.job_best.project_name, self.job_best.problem_type, self.job_best.model.metrics_name, self.job_best.score)
+    info_dic = info.getDictionary()
+    filepath = definitions.getProejctInfoFilePath(self.job_best.project_name)
+    utils.writeJsonToFile(info_dic, filepath)
 
   def __makeResultDataFrame(self):
     modelname_list = []

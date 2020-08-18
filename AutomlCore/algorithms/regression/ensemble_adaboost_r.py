@@ -36,4 +36,7 @@ class AdaBoostRegressor(model.Model, model_regression.ModelRegression):
 
   def getPredictProbaResult(self, x):
     return self.model.predict_proba(x)
+
+  def getMaxIterCount(self):    
+    return 2 ** 3
     

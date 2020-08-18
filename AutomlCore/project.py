@@ -22,7 +22,7 @@ def getProjectList():
   info_list = []
   project_name_list = os.listdir(definitions.getResultsPath())
   for project_name in project_name_list:
-    if not os.path.isdir(os.path.join(definitions.getResultsPath(), project_name_list)):
+    if not os.path.isdir(os.path.join(definitions.getResultsPath(), project_name)):
       continue
     filepath = definitions.getProejctInfoFilePath(project_name)
     info_list.append(utils.getJsonFromFile(filepath))

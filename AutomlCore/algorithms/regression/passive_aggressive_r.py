@@ -34,3 +34,6 @@ class PassiveAggresiveRegressor(model.Model, model_regression.ModelRegression):
   
   def getPredictResult(self, x):
     return self.model.predict(x)
+
+  def getMaxIterCount(self):    
+    return 2 ** 3

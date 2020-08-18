@@ -42,3 +42,5 @@ class SgdRegressor(model.Model, model_regression.ModelRegression):
   
   def getPredictResult(self, x):
     return self.model.predict(x)
+
+  
