@@ -7,7 +7,7 @@ from sklearn.linear_model import Lars
 import numpy as np
 import json
 import joblib
-from utils import definitions
+from utils import definitions, utils
 from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
 from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST, KEY_FEATURE_SEL_COL_LIST
 import datetime
@@ -38,27 +38,28 @@ class TrainModel:
       'model': self.job.model.getHyperParameterSpace(),
     }
 
-  def __getPreprocessedDf(self, _df, _params, _column_list=None):
+  def __getPreprocessedDf(self, _df, _params, _column_list=[]):
     df = _df.copy()
     df = (list(self.f_missing.values())[_params[KEY_FEATURE_MIS_NAME]])(df)
     df = (list(self.f_outlier.values())[_params[KEY_FEATURE_OUT_NAME]])(df)
     df = (list(self.f_add.values())[_params[KEY_FEATURE_ADD_NAME]])(df)    
     x, y = self.__splitXy(df)
     x = (list(self.f_scaler.values())[_params[KEY_FEATURE_SCA_NAME]])(x)    
-    if _column_list:
-      x = x[_column_list]
-      return x, y, _column_list
-    else:
-      x, columns = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, _params[KEY_FEATURE_SEL_RATE_NAME])
-      return x, y, columns
+    # if len(_column_list) == 0:
+    #   x, columns = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, _params[KEY_FEATURE_SEL_RATE_NAME])
+    #   return x, y, columns      
+    # else:
+    #   x = x[_column_list]
+    #   return x, y, _column_list
+    return x, y, _column_list
       
-
   def __splitXy(self, _df):
     y = _df[[self.job.target_column]]
     x = _df.drop(self.job.target_column, axis=1)
     return x, y
   
   def __minizeScore(self, _params):
+    # train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, _params)
     train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, _params)
     test_x, test_y, test_columns = self.__getPreprocessedDf(self.job.df_test, _params, train_columns)
     score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, _params['model'])
@@ -115,17 +116,19 @@ class TrainModel:
   
   def __saveBestParams(self, _best):
     filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
-    with open(filepath, 'w') as result_file:
-      json.dump(_best, result_file, default=self.__jsonConverter)
+    utils.writeJsonToFile(_best, filepath)
+    # with open(filepath, 'w') as result_file:
+    #   json.dump(_best, result_file, default=self.__jsonConverter)
   
   def getBestParams(self):
     filepath = definitions.getBestModelParamsFilePath(self.job.project_name, self.job.model.model_name, self.job.data_ratio)
-    if os.path.exists(filepath):
-      result_file = open(filepath, 'r')
-      best = json.load(result_file)
-      result_file.close()
-      return best
-    return {}
+    return utils.getJsonFromFile(filepath)
+    # if os.path.exists(filepath):
+    #   result_file = open(filepath, 'r')
+    #   best = json.load(result_file)
+    #   result_file.close()
+    #   return best
+    # return {}
 
   def __jsonConverter(self, obj):
     if isinstance(obj, np.integer):

@@ -3,8 +3,13 @@ import numpy as np
 from pathlib import Path
 import multiprocessing
 
-PROBLEM_TYPE_CLASSIFICATION = 0
-PROBLEM_TYPE_REGRESSION = 1
+PROBLEM_TYPE_CLASSIFICATION = 'Classification'
+PROBLEM_TYPE_REGRESSION = 'Regression'
+
+KEY_PROJECT_NAME = 'project_name'
+KEY_PROJECT_PROBLEM_TYPE = 'project_type'
+KEY_PROJECT_METRICS = 'project_metrics'
+KEY_PROJECT_LOSS = 'project_loss'
 
 KEY_FEATURE_ADD_NAME = 'feature_add'
 KEY_FEATURE_MIS_NAME = 'feature_missing'
@@ -33,13 +38,22 @@ def getPreprocessPath():
   rootPath = getProjectRootPath()
   return os.path.join(rootPath, 'preprocess')
 
-def getProjectResultsPath(_project_name):
+def getResultsPath():
   rootPath = getProjectRootPath()
   resultsPath = os.path.join(rootPath, 'results')
+  return resultsPath
+
+def getProjectResultsPath(_project_name):
+  resultsPath = getResultsPath()
   project_path = os.path.join(resultsPath, _project_name)
   if not os.path.exists(project_path):
     os.makedirs(project_path)
   return project_path
+
+def getProejctInfoFilePath(_project_name):
+  project_path = getProjectResultsPath(_project_name)
+  filename = 'meta_info.json'
+  return os.path.join(project_path, filename)
 
 def __getBestModelFilePath(_project_name, _model_name, _data_ratio, _extends):
   project_path = getProjectResultsPath(_project_name)

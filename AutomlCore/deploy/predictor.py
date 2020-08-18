@@ -35,13 +35,13 @@ class Predictor:
   def __getPreprocessedDf(self, _df, _params):
     df = _df.copy()
     df = (list(self.f_missing.values())[_params['feature_missing']])(df)
-    df = (list(self.f_outlier.values())[_params['feature_outlier']])(df)
+    # df = (list(self.f_outlier.values())[_params['feature_outlier']])(df)
     df = (list(self.f_add.values())[_params['feature_add']])(df)    
     # x = (list(self.f_scaler.values())[_params['feature_scaler']])(df)
     # x, y = self.__splitXy(df)
     x = (list(self.f_scaler.values())[_params[KEY_FEATURE_SCA_NAME]])(df)
     # x = (list(self.f_selection.values())[_params[KEY_FEATURE_SEL_NAME]])(x, y, _params[KEY_FEATURE_SEL_RATE_NAME])
-    feature_list = _params[KEY_FEATURE_SEL_COL_LIST]
-    x = x[feature_list]
+    # feature_list = _params[KEY_FEATURE_SEL_COL_LIST]
+    # x = x[feature_list]
     return x
 

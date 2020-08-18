@@ -1,4 +1,9 @@
 import pandas as pd
+import numpy as np
+import datetime
+import json
+import os
+from . import definitions
 
 def isDateColumn(_df, _column):
   try:
@@ -41,3 +46,25 @@ def convertObjectType(_df):
       _df[column + '_convert'] = pd.factorize(_df[column])[0]
       _df = _df.drop(column, axis=1)
   return _df
+
+def __jsonConverter(self, obj):
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, datetime.datetime):
+        return obj.__str__()
+
+def writeJsonToFile(_json, _filepath):
+  with open(_filepath, 'w') as result_file:
+    json.dump(_json, result_file, default=__jsonConverter)
+
+def getJsonFromFile(_filepath):
+  if os.path.exists(_filepath):
+    result_file = open(_filepath, 'r')
+    best = json.load(result_file)
+    result_file.close()
+    return best
+  return {}

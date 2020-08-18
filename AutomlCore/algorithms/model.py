@@ -9,6 +9,7 @@ class Model:
     self.results_path = definitions.getProjectResultsPath(_project_name)
     self.model_name = 'model'
     self.model = None
+    self.metrics_name = 'Accucary'
     self.max_eval_step = 30
     self.params_list = {}
     self.params_best = {}

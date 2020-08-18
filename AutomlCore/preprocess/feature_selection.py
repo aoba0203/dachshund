@@ -11,6 +11,7 @@ from sklearn.feature_selection import SelectKBest, f_regression, f_classif, RFE
 from sklearn.feature_selection import SelectFromModel
 from xgboost import XGBRegressor, XGBClassifier
 import operator
+import os
 #%%
 class FeatureSelection:
   def __init__(self, _problem_type):
@@ -60,7 +61,7 @@ class FeatureSelection:
     selector = RFE(estimator, n_features_to_select=column_count).fit(df, _y)
     column = np.array(df.columns)
     new_columns = column[np.where(selector.ranking_ == 1, True, False)]
-    new_x = selector.transform(df)
+    new_x = pd.DataFrame(selector.transform(df), columns=new_columns)
     return new_x, new_columns
 
   def getFeatureSelectionMethodList(self):    

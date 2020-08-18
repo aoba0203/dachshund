@@ -25,11 +25,17 @@ algorithms/classification/svc_c.py
 algorithms/classification/svc_linear_c.py
 algorithms/classification/tree_decision_c.py
 algorithms/classification/xgboost_c.py
+algorithms/ensemble/__init__.py
+algorithms/ensemble/stacking_c.py
+algorithms/ensemble/stacking_r.py
+algorithms/ensemble/voting_c.py
+algorithms/ensemble/voting_r.py
 algorithms/regression/__init__.py
 algorithms/regression/_elasticnet multitask_r.py
 algorithms/regression/_huber_r.py
 algorithms/regression/_lasso_multitask_r.py
 algorithms/regression/_logistic_r.py
+algorithms/regression/_neural_network_r.py
 algorithms/regression/_perceptron_r.py
 algorithms/regression/ard_regression_r.py
 algorithms/regression/bayesian_ridge_r.py
@@ -39,12 +45,11 @@ algorithms/regression/ensemble_extra_tree_r.py
 algorithms/regression/ensemble_gradient_boosting_r.py
 algorithms/regression/ensemble_hist_gradient_boosting_r.py
 algorithms/regression/ensemble_random_forest_r.py
-algorithms/regression/lars_lasso.py
+algorithms/regression/lars_lasso_r.py
 algorithms/regression/lars_r.py
 algorithms/regression/lasso_r.py
 algorithms/regression/lightgbm_r.py
 algorithms/regression/linear_r.py
-algorithms/regression/neural_network_r.py
 algorithms/regression/omp_r.py
 algorithms/regression/passive_aggressive_r.py
 algorithms/regression/ransac_r.py
@@ -56,6 +61,8 @@ dachshund.egg-info/PKG-INFO
 dachshund.egg-info/SOURCES.txt
 dachshund.egg-info/dependency_links.txt
 dachshund.egg-info/top_level.txt
+deploy/__init__.py
+deploy/predictor.py
 eda/__init__.py
 eda/data_explore.py
 eda/data_frame.py
@@ -67,6 +74,7 @@ preprocess/feature_add.py
 preprocess/feature_missing.py
 preprocess/feature_outlier.py
 preprocess/feature_scaler.py
+preprocess/feature_selection.py
 training/__init__.py
 training/train_job.py
 training/train_manager.py

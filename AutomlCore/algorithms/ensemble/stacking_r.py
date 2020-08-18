@@ -27,7 +27,7 @@ class StackingRegressor(model.Model, model_regression.ModelRegression):
     for idx, job in enumerate(self.cantidate_job_list):
       if idx == _params['max_estimator']:
         break
-      estimator_list.append((job.model.getJobName(), job.trained_model))
+      estimator_list.append((job.getJobName(), job.trained_model))
     return Stacking(
       estimators=estimator_list,
       # verbosity = 0,

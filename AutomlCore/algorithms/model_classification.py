@@ -1,7 +1,11 @@
 from sklearn.metrics import accuracy_score
 
 
-class ModelClassification:  
+class ModelClassification:
+  def __init__(self, _project_name):
+    super().__init__(_project_name)
+    self.metrics_name = 'Accucary'
+  
   def getTrainResults(self, _x, _y, _x_eval, _y_eval, _params, _for_optimize=True, scorer=accuracy_score):
     _params['verbose'] = 0
     model = self.getModel(_params)

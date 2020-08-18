@@ -21,6 +21,7 @@ from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FE
 from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST
 import queue
 import pandas as pd
+from .. import project
 
 class WorkerAdmin(WorkerObserver):
   def __init__(self, _problem_type, _project_name, _df, _target_column, _ensemble_model_list, _worker_count=4):
@@ -33,6 +34,7 @@ class WorkerAdmin(WorkerObserver):
     self.train_stage = 0
     self.train_model_count_list = [20, 10, 7, 5, 3]
     self.train_data_ratio_list = [15, 30, 40, 50, 100, 100]
+    self.job_best = None
     self.job_list = []
     self.trained_job_list = []
     self.process_dic = {}
@@ -97,8 +99,7 @@ class WorkerAdmin(WorkerObserver):
     self.trained_job_list.append(_job)
     self.job_list.append(_job)
     print('Job End - ',  _job, ', stage: ', self.train_stage, ', qsize: ', self.job_queue.qsize(), ', process size: ', len(self.process_dic))
-    # with self.lock:
-    # if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0) & (self.train_stage < (len(self.train_data_ratio_list)-1)):
+    self.__writeProjectInfo(_job)
     if (self.job_queue.qsize() == 0) & (len(self.process_dic) ==0):
       if self.train_stage < (len(self.train_data_ratio_list)-2):
         self.train_stage += 1
@@ -117,7 +118,16 @@ class WorkerAdmin(WorkerObserver):
 
     # print('process Close()')
     # proc.close()
-      
+
+  def __writeProjectInfo(self, _job):
+    if (self.job_best):
+      if self.job_best.score > _job.score:
+        self.job_best = _job
+        info = project.ProjectMetaInfo(self.job_best.project_name, self.job_best.problem_type, self.job_best.model.metrics_name, self.job_best.score)
+        info_dic = info.getDictionary()
+        filepath = definitions.getProejctInfoFilePath(self.job_best.project_name)
+        utils.writeJsonToFile(info_dic, filepath)
+
   def __makeResultDataFrame(self):
     modelname_list = []
     dataratio_list = []
