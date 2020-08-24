@@ -53,3 +53,6 @@ class XgboostClassifier(model.Model, model_classification.ModelClassification):
   
   def getPredictResult(self, x):
     return self.model.predict(x)
+
+  def getMaxIterCount(self):    
+    return 2 ** 6

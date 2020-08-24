@@ -47,7 +47,7 @@ def convertObjectType(_df):
       _df = _df.drop(column, axis=1)
   return _df
 
-def __jsonConverter(self, obj):
+def __jsonConverter(obj):
     if isinstance(obj, np.integer):
         return int(obj)
     elif isinstance(obj, np.floating):

@@ -50,3 +50,4 @@ class SvcClassifier(model.Model, model_classification.ModelClassification):
   def getPredictProbaResult(self, x):
     return self.model.predict_proba(x)
     
+    

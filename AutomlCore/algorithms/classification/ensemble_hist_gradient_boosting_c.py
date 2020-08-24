@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.experimental import enable_hist_gradient_boosting
 from sklearn.ensemble import HistGradientBoostingClassifier as HistGradientBoosting
-from sklearn.metrics import accuracy_score
 from hyperopt import hp
 from utils import definitions
 from .. import model, model_classification
@@ -48,4 +47,6 @@ class HistGradientBoostingClassifier(model.Model, model_classification.ModelClas
 
   def getPredictProbaResult(self, x):
     return self.model.predict_proba(x)
-    
+  
+  def getMaxIterCount(self):    
+    return 2 ** 5

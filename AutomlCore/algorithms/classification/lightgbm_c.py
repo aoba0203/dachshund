@@ -1,6 +1,5 @@
 import numpy as np
 from lightgbm import LGBMClassifier
-from sklearn.metrics import accuracy_score
 from hyperopt import hp
 from utils import definitions
 from .. import model, model_classification
@@ -50,3 +49,6 @@ class LightGbmClassifier(model.Model, model_classification.ModelClassification):
   
   def getPredictResult(self, x):
     return self.model.predict(x)
+
+  def getMaxIterCount(self):    
+    return 2 ** 6

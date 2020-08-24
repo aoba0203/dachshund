@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.naive_bayes import ComplementNB
-from sklearn.metrics import accuracy_score
 from hyperopt import hp
 from utils import definitions
 from .. import model, model_classification
@@ -33,4 +32,7 @@ class ComplementNBClassifier(model.Model, model_classification.ModelClassificati
 
   def getPredictProbaResult(self, x):
     return self.model.predict_proba(x)
+  
+  def getMaxIterCount(self):    
+    return 2 ** 2
     

@@ -36,4 +36,6 @@ class AdaBoostClassifier(model.Model, model_classification.ModelClassification):
 
   def getPredictProbaResult(self, x):
     return self.model.predict_proba(x)
-    
+  
+  def getMaxIterCount(self):    
+    return 2 ** 3

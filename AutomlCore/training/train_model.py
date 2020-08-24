@@ -8,7 +8,7 @@ import numpy as np
 import json
 import joblib
 from utils import definitions, utils
-from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
+from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME, KEY_PROJECT_SCORE
 from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST, KEY_FEATURE_SEL_COL_LIST
 import datetime
 
@@ -42,7 +42,7 @@ class TrainModel:
     df = _df.copy()
     df = (list(self.f_missing.values())[_params[KEY_FEATURE_MIS_NAME]])(df)
     df = (list(self.f_outlier.values())[_params[KEY_FEATURE_OUT_NAME]])(df)
-    df = (list(self.f_add.values())[_params[KEY_FEATURE_ADD_NAME]])(df)    
+    # df = (list(self.f_add.values())[_params[KEY_FEATURE_ADD_NAME]])(df)    
     x, y = self.__splitXy(df)
     x = (list(self.f_scaler.values())[_params[KEY_FEATURE_SCA_NAME]])(x)    
     # if len(_column_list) == 0:
@@ -104,14 +104,15 @@ class TrainModel:
     params = self.getBestParams()
     train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, params)
     test_x, test_y, test_columns = self.__getPreprocessedDf(self.job.df_test, params, train_columns)
-    params[KEY_FEATURE_SEL_COL_LIST] = train_columns
-    self.__saveBestParams(params)
     model = self.__getSavedModel()
     if model == None:
       score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, params, _for_optimize=False)
       self.__saveTrainedModel(model)
     else:
       score = self.job.model.getTrainedModelScore(model, test_x, test_y, _for_optimize=False)
+    params[KEY_FEATURE_SEL_COL_LIST] = train_columns
+    params[KEY_PROJECT_SCORE] = score
+    self.__saveBestParams(params)
     return params, model, score
   
   def __saveBestParams(self, _best):
