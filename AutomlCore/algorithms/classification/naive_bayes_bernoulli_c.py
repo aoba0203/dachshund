@@ -19,7 +19,7 @@ class BernoulliNBClassifier(model.Model, model_classification.ModelClassificatio
   def getModel(self, _params):
     return BernoulliNB(
       alpha= _params['alpha'],
-      norm= _params['binarize'],
+      binarize= _params['binarize'],
     )
 
   def trainModel(self, x, y, _params):

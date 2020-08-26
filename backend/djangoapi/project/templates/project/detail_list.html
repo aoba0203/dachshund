@@ -1,0 +1,26 @@
+{# project/templates/project/project.html #}
+{% load poll_extras %}
+{% load render_table from django_tables2 %}
+
+<!doctype html>
+<html>
+
+<head>
+	<title>List of Project</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+</head>
+
+<body>
+	<h3> {% getValue json_data "project_name" %} </h3>
+	<h6> Target: {% getValue json_data "column_target" %}</h6>
+	<h6> Columns: {% getValue json_data "column_list" %}</h6>
+	<h6> EDA: {% getValue json_data "eda_path" %}</h6>
+	<h6> Outlier: {% getValue json_data "out_path" %}</h6>
+	{% render_table table %}
+	</script>
+
+	
+	
+</body>
+
+</html>

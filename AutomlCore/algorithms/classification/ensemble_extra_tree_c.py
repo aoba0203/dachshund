@@ -17,7 +17,7 @@ class ExtraTreesClassifier(model.Model, model_classification.ModelClassification
 
   def getHyperParameterSpace(self):
     return {
-      'n_estimators': hp.quniform('n_estimators', 50, 200, 5),
+      'n_estimators': hp.quniform('n_estimators', 50, 100, 5),
       'criterion': hp.choice('criterion', self.params_list['criterion']),
       # 'max_depth': hp.quniform('max_depth', 2, 24, 2),
       # 'min_samples_split': hp.uniform('min_samples_split', 0, 1),
@@ -27,7 +27,7 @@ class ExtraTreesClassifier(model.Model, model_classification.ModelClassification
       # 'max_leaf_nodes': hp.quniform('max_leaf_nodes', 2, 48, 2),
       # 'min_impurity_decrease': hp.uniform('min_impurity_decrease', 0, 1),
       # 'bootstrap': hp.choice('bootstrap', [False, True]),
-      'oob_score': hp.choice('oob_score', [False, True]),
+      # 'oob_score': hp.choice('oob_score', [False, True]),
       'class_weight': hp.choice('class_weight', self.params_list['class_weight']),
       # 'ccp_alpha': hp.uniform('ccp_alpha', 0, 2),
     }
@@ -44,7 +44,8 @@ class ExtraTreesClassifier(model.Model, model_classification.ModelClassification
       # max_leaf_nodes= int(_params['max_leaf_nodes']),
       # min_impurity_decrease= _params['min_impurity_decrease'],
       # bootstrap= _params['bootstrap'],
-      oob_score= bool(_params['oob_score']),
+      # bootstrap=True,
+      # oob_score= bool(_params['oob_score']),
       class_weight= _params['class_weight'],
       # ccp_alpha= _params['ccp_alpha']
       n_jobs= definitions.getNumberOfCore(),

@@ -1,5 +1,9 @@
 from django.db import models
 
+class UploadFile(models.Model):
+  title = models.TextField(default='')
+  file = models.FileField(null=True)
+
 # Create your models here.
 class Project(models.Model):
   created = models.DateTimeField(auto_created=True)

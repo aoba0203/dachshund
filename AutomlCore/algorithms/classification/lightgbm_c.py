@@ -9,7 +9,8 @@ class LightGbmClassifier(model.Model, model_classification.ModelClassification):
     super().__init__(_project_name)
     self.model_name = 'LightGBMClassifier'
     self.params_list = {
-      'boosting_type': ['gbdt', 'goss', 'rf', 'dart'],
+      # 'boosting_type': ['gbdt', 'goss', 'rf', 'dart'],
+      'boosting_type': ['gbdt', 'goss', 'dart'],
     }
 
   def getHyperParameterSpace(self):

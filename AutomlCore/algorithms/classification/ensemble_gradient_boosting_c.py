@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier as GradientBoosting
-from sklearn.metrics import accuracy_score
 from hyperopt import hp
 from utils import definitions
 from .. import model, model_classification
@@ -10,7 +9,7 @@ class GradientBoostingClassifier(model.Model, model_classification.ModelClassifi
     super().__init__(_project_name)
     self.model_name = 'GradientBoostingClassifier'
     self.params_list = {
-      'loss': ['deviance', 'exponential'],
+      # 'loss': ['deviance', 'exponential'],
       'criterion': ['friedman_mse', 'mse', 'mae'],
       'max_features': [None, 'auto', 'sqrt','log2'],
     }
@@ -58,4 +57,5 @@ class GradientBoostingClassifier(model.Model, model_classification.ModelClassifi
 
   def getPredictProbaResult(self, x):
     return self.model.predict_proba(x)
+ 
     

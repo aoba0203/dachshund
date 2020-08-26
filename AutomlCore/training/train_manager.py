@@ -48,7 +48,7 @@ class TrainManager:
       self.model_list.append(ensemble_hist_gradient_boosting_c.HistGradientBoostingClassifier(self.project_name))
       self.model_list.append(ensemble_random_forest_c.RandomForestClassifier(self.project_name))
       self.model_list.append(naive_bayes_bernoulli_c.BernoulliNBClassifier(self.project_name))
-      self.model_list.append(naive_bayes_categorical_c.CategoricalNBClassifier(self.project_name))
+      # self.model_list.append(naive_bayes_categorical_c.CategoricalNBClassifier(self.project_name))
       self.model_list.append(naive_bayes_complement_c.ComplementNBClassifier(self.project_name))
       self.model_list.append(naive_bayes_gaussian_c.GaussianNbClassifier(self.project_name))
       self.model_list.append(naive_bayes_multinomial_c.MultinomialNbClassifier(self.project_name))

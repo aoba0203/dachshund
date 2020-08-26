@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -27,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Application definition
 
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
 
     'post',
     'project',
+    'django_tables2',
     'rest_framework',
     'corsheaders',
 ]
@@ -63,11 +67,11 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = [
-    "https://example.com",    
-    "http://localhost:3000",
-    "http://127.0.0.1:3000"
-]
+# CORS_ORIGIN_WHITELIST = [
+#     "https://example.com",    
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000"
+# ]
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -90,12 +94,13 @@ CHANNEL_LAYERS = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],

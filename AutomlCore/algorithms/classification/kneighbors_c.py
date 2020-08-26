@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
 from hyperopt import hp
 from utils import definitions
 from .. import model, model_classification

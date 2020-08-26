@@ -10,7 +10,7 @@ KEY_PROJECT_NAME = 'project_name'
 KEY_PROJECT_PROBLEM_TYPE = 'project_type'
 KEY_PROJECT_METRICS = 'project_metrics'
 KEY_PROJECT_LOSS = 'project_loss'
-KEY_SCORE = 'score'
+KEY_PROJECT_SCORE = 'score'
 
 KEY_FEATURE_ADD_NAME = 'feature_add'
 KEY_FEATURE_MIS_NAME = 'feature_missing'
@@ -31,6 +31,10 @@ def getProjectRootPath():
   # return os.path.dirname(os.path.abspath(__file__))
   return parent
 
+def getWatchingFolder():
+  path = Path(getProjectRootPath())
+  return os.path.join(path.parent, 'media')
+
 def getEdaPath():
   rootPath = getProjectRootPath()
   return os.path.join(rootPath, 'eda')
@@ -40,7 +44,9 @@ def getPreprocessPath():
   return os.path.join(rootPath, 'preprocess')
 
 def getResultsPath():
-  rootPath = getProjectRootPath()
+  # rootPath = getProjectRootPath()
+  # resultsPath = os.path.join(rootPath, 'results')
+  rootPath = getWatchingFolder()
   resultsPath = os.path.join(rootPath, 'results')
   return resultsPath
 

@@ -16,7 +16,7 @@ class NuSvcClassifier(model.Model, model_classification.ModelClassification):
 
   def getHyperParameterSpace(self):
     return {
-      'nu': hp.uniform('nu', 0, 1), 
+      # 'nu': hp.uniform('nu', 0, 1), 
       # 'kernel': hp.choice('kernel', ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed']),
       'kernel': hp.choice('kernel', self.params_list['kernel']),
       'degree': hp.choice('degree', self.params_list['degree']),
@@ -28,7 +28,7 @@ class NuSvcClassifier(model.Model, model_classification.ModelClassification):
 
   def getModel(self, _params):
     return NuSVC(
-      C= _params['C'],
+      # nu= _params['nu'],
       kernel= _params['kernel'],
       degree= _params['degree'],
       gamma= _params['gamma'],

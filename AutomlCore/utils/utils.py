@@ -7,10 +7,13 @@ from . import definitions
 
 def isDateColumn(_df, _column):
   try:
+    if len(_df[_df[_column] < 0]) > 0:
+      return False
     df_local = pd.to_datetime(_df[_column])
     len_unique_day = len(pd.unique(df_local.dt.day))
     len_unique_hour = len(pd.unique(df_local.dt.hour))
-    if (len_unique_day > 1) | (len_unique_hour > 1):
+    # if (len_unique_day > 1) | (len_unique_hour > 1):
+    if (len_unique_day > 7):
       return True
   except:
     return False

@@ -1,0 +1,8 @@
+<form action="" method="post" enctype="multipart/form-data">
+  {% csrf_token %}  
+  </br>
+  {{form|linebreaks}} 
+  </br>
+  <input type='submit' value='submit'>
+  <!-- <button name="choice" value="{{form.value}}">파일 올리기</button> -->
+</form>

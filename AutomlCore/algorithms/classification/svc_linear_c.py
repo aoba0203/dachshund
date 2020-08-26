@@ -25,7 +25,7 @@ class SvcLinearClassifier(model.Model, model_classification.ModelClassification)
 
   def getModel(self, _params):
     return LinearSVC(
-      penalty= _params['penalty'],
+      # penalty= _params['penalty'],
       C= _params['C'],
       fit_intercept= bool(_params['fit_intercept']),
       class_weight= _params['class_weight'],
@@ -43,4 +43,4 @@ class SvcLinearClassifier(model.Model, model_classification.ModelClassification)
 
   def getPredictProbaResult(self, x):
     return self.model.predict_proba(x)
-    
+  
