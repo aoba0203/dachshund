@@ -5,13 +5,16 @@ from . import views
 router = DefaultRouter()
 router.register('info', views.ListProjects)
 router.register('detail', views.ProjectsDetail)
+# router.register('detail', views.list_project)
 # router.register('table', views.ProjectTable)
 # router.register('upload', views.index)
 
 urlpatterns = [
   path('upload', views.index),
   path('table', views.tableProjects), 
-  path('tdetail/<str:project>', views.tableDetailProjects),
+  path('info/<int:pk>/', views.project_info),
+  path('detail/<int:pk/', views.project_detail),
+  path('tdetail/<str:project>/', views.tableDetailProjects),
   # path('detail', views.ProjectDetail.as_view({
   #   'get': 'highlight',
   # })),

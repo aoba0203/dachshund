@@ -62,12 +62,20 @@ class ListProjects(viewsets.ModelViewSet):
     search = self.request.query_params.get('project', "")
     if search:
       qs = qs.filter(project_name=search)
-    return qs  
+    return qs
+  
+  def pre_save(self, obj):
+    obj.samplesheet = self.request.FILES.get('file')
+
+project_info = ListProjects.as_view({
+  'get': 'retrieve',
+  'put': 'update',
+  'patch': 'partial_update',
+  'delete': 'destroy',
+})
 
 def tableDetailProjects(request, project):
   qs = ProjectDetail.objects.all()
-  # search = request.query_params.get('project', "")
-  # if search:
   print('project name: ', project)
   qs = qs.filter(project_name=project)
   jsonData = ProjectDetailSerializer(qs, many=True)
@@ -104,13 +112,15 @@ class ProjectsDetail(viewsets.ModelViewSet):
   serializer_class = ProjectDetailSerializer  
   
   def get_queryset(self):
-    # queryset = self.queryset
     qs = super().get_queryset()
     search = self.request.query_params.get('project', "")
     if search:
-      qs = qs.filter(project_name=search)
-    # jsonData = ProjectDetailSerializer(qs, many=True)
-    # return json.loads(json.dumps(jsonData.data[0]))
-    # print('req', self.request)
-    # print('data', json.dumps(jsonData.data))
+      qs = qs.filter(project_name=search)    
     return qs
+
+project_detail = ProjectsDetail.as_view({
+  'get': 'retrieve',
+  'put': 'update',
+  'patch': 'partial_update',
+  'delete': 'destroy',
+})
