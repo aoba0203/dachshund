@@ -10,11 +10,14 @@ router.register('detail', views.ProjectsDetail)
 # router.register('upload', views.index)
 
 urlpatterns = [
-  path('upload', views.index),
-  path('table', views.tableProjects), 
+  path('upload', views.index, name='upload'),
+  path('tinfo', views.tableProjects, name='tinfo'), 
+  path('tinfo/', views.tableProjects, name='tinfo'), 
+  path('info/<int:pk>', views.project_info),
   path('info/<int:pk>/', views.project_info),
-  path('detail/<int:pk/', views.project_detail),
-  path('tdetail/<str:project>/', views.tableDetailProjects),
+  path('detail/<int:pk>', views.project_detail),
+  path('detail/<int:pk>/', views.project_detail),
+  path('tdetail/<str:project>/', views.tableDetailProjects, name='tdetail'),
   # path('detail', views.ProjectDetail.as_view({
   #   'get': 'highlight',
   # })),

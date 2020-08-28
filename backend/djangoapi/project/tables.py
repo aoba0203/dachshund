@@ -2,7 +2,7 @@ import django_tables2 as tables
 from .models import Project
 
 class ProjectTable(tables.Table):
-  detail = tables.TemplateColumn('''<a href="/pjt/detail/?project={{ record.project_name }}">Detail</a>''')
+  detail = tables.TemplateColumn('''<a href="/pjt/tdetail/{{ record.project_name }}">Detail</a>''')
   class Meta:
     model = Project
     template_name = "django_tables2/semantic.html"

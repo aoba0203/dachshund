@@ -10,6 +10,15 @@ from utils import definitions
 from algorithms import outlier
 
 #%%
+
+def getDataframeHtmlFilePath(project_name):
+  # eda_path = definitions.getEdaPath()
+  # results_path = os.path.join(eda_path, 'results')
+  path_result = definitions.getProjectResultsPath(project_name)    
+  if os.path.exists(path_result) == False:
+    os.makedirs(path_result)
+  return os.path.join(path_result, (project_name + '-outlier.html'))
+
 class DfOutlier(data_frame.DataFrame):
   def __init__(self, _project_name, _csv_filepath):
     self.project_name = _project_name
@@ -27,16 +36,8 @@ class DfOutlier(data_frame.DataFrame):
     df = df.drop(drop_column_list, axis=1)
     return df
 
-  def getDataframeHtmlFilePath(self):
-    # eda_path = definitions.getEdaPath()
-    # results_path = os.path.join(eda_path, 'results')
-    path_result = definitions.getProjectResultsPath(self.project_name)    
-    if os.path.exists(path_result) == False:
-      os.makedirs(path_result)
-    return os.path.join(path_result, (self.project_name + '-outlier.html'))
-
   def makeDataframeHtmlFile(self):
-    if not os.path.exists(self.getDataframeHtmlFilePath()):
+    if not os.path.exists(getDataframeHtmlFilePath(self.project_name)):
       pred_forest = outlier.getIsolationForest(self.df)
       pred_robust = outlier.getRobustCovairance(self.df)
       pred_local = outlier.getLocalFactor(self.df)
@@ -45,12 +46,12 @@ class DfOutlier(data_frame.DataFrame):
       df_result['robust'] = pred_robust
       df_result['local'] = pred_local
       self.df_outlier = df_result[(df_result['forest'] == -1) & (df_result['robust'] == -1) & (df_result['local'] == -1)]    
-      self.df_outlier[self.df.columns].to_html(self.getDataframeHtmlFilePath(), justify='center')
+      self.df_outlier[self.df.columns].to_html(getDataframeHtmlFilePath(self.project_name), justify='center')
     else:
-      self.df_outlier = pd.read_html(self.getDataframeHtmlFilePath(), index_col=0)
+      self.df_outlier = pd.read_html(getDataframeHtmlFilePath(self.project_name), index_col=0)
 
   def getRemovedOutlierDf(self):
-    if not os.path.exists(self.getDataframeHtmlFilePath()):
+    if not os.path.exists(getDataframeHtmlFilePath(self.project_name)):
       self.makeDataframeHtmlFile()
     return self.df.drop(self.df_outlier.index, axis=0)
 

@@ -2,6 +2,7 @@ from django_tables2.config import RequestConfig
 from rest_framework import generics, viewsets, renderers
 from rest_framework.decorators import action
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django import template
 from .serializers import ProjectSerializer, ProjectDetailSerializer
 from .models import Project, ProjectDetail
@@ -35,7 +36,8 @@ def index(request):
               destination.write(chunk)
         handle_uploaded_file(x)
       # return render(request, 'upload.html', context)
-      return HttpResponse(" File uploaded! ")
+      # return HttpResponse(" File uploaded! ")
+      return HttpResponseRedirect(reverse('tinfo'))
   else:
     form = UploadFileForm()
   return render(request, 'upload.html', {'form': form})
@@ -62,10 +64,7 @@ class ListProjects(viewsets.ModelViewSet):
     search = self.request.query_params.get('project', "")
     if search:
       qs = qs.filter(project_name=search)
-    return qs
-  
-  def pre_save(self, obj):
-    obj.samplesheet = self.request.FILES.get('file')
+    return qs 
 
 project_info = ListProjects.as_view({
   'get': 'retrieve',
@@ -82,9 +81,10 @@ def tableDetailProjects(request, project):
   qs = json.loads(json.dumps(jsonData.data[0]))
   dic_project_info = {'project_name': qs['project_name'], 'column_list': qs['column_list'], 'column_target': qs['column_target'], 'eda_path': qs['eda_path'], 'out_path': qs['out_path']}
   dic_params = {}
-  results = qs['train_results']
+  results = qs['train_results']  
   data = []
-  for idx, result in enumerate(json.loads(results)):
+  for idx, result in enumerate(json.loads(results.replace("'", "\""))):
+  # for idx, result in enumerate(json.loads(results)):
     dic_result = {}
     dic_result['id'] = idx
     dic_result['model_name'] = result['model_name']
@@ -100,7 +100,7 @@ def tableDetailProjects(request, project):
     dic_result['score'] = result['score']
     del(result['score'])
     dic_result['params_'] = result
-    dic_params[dic_result['model_name'] + '_' + dic_result['model_drate']] = result
+    dic_params[dic_result['model_name'] + '_' + str(dic_result['model_drate'])] = result
     data.append(dic_result)
   table = DetailTable(data)
   RequestConfig(request).configure(table)

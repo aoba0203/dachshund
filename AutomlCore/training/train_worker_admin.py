@@ -12,9 +12,9 @@ from .train_model import TrainModel
 from sklearn.model_selection import train_test_split
 from multiprocessing import Process
 import threading
-from utils import utils
+from utils import utils, http_request
 import threading
-# from threading import Lock
+from eda import de_pdprofiling, df_outlier
 from multiprocessing import Lock
 from utils import definitions
 from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
@@ -22,6 +22,7 @@ from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LI
 import queue
 import pandas as pd
 import project
+import glob
 
 class WorkerAdmin(WorkerObserver):
   def __init__(self, _problem_type, _project_name, _df, _target_column, _ensemble_model_list, _worker_count=4):
@@ -53,7 +54,7 @@ class WorkerAdmin(WorkerObserver):
     ratio = self.train_data_ratio_list[self.train_stage]
     train = self.train.sample(int(len(self.train) * (ratio * 0.01)))
     for model in _model_list:
-      job = Job(self.problem_type, self.project_name, ratio, train, self.test, self.target_column, model)
+      job = Job(self.problem_type, self.project_name, ratio, train, self.test, list(train.columns), self.target_column, model)
       self.job_queue.put(job)
     print('makeJobQueue Stage: ' + str(self.train_stage) + ', Job Size: ' + str(self.job_queue.qsize()))
   
@@ -96,6 +97,7 @@ class WorkerAdmin(WorkerObserver):
 
   def update(self, _event, _job, _worker):
     _worker.unregisterObserver(self)
+    self.__writeToServerProjectDetail(_job)
     self.trained_job_list.append(_job)
     self.job_list.append(_job)
     print('Job End - ',  _job, ', stage: ', self.train_stage, ', qsize: ', self.job_queue.qsize(), ', process size: ', len(self.process_dic))
@@ -119,6 +121,43 @@ class WorkerAdmin(WorkerObserver):
     # print('process Close()')
     # proc.close()
 
+  def __makeTrainedResultJsonData(self, _project_name):
+    result_path = definitions.getProjectResultsPath(_project_name)
+    file_path_list = glob.glob(str(result_path) + '/*_*.json')
+    json_result_list = []
+    for file_path in file_path_list:
+      if 'meta_info' in file_path:
+        continue
+      json_data = utils.getJsonFromFile(file_path)
+      json_data[KEY_FEATURE_MIS_NAME] = json_data[KEY_FEATURE_MIS_NAME_LIST][json_data[KEY_FEATURE_MIS_NAME]]
+      del(json_data[KEY_FEATURE_MIS_NAME_LIST])
+      json_data[KEY_FEATURE_OUT_NAME] = json_data[KEY_FEATURE_OUT_NAME_LIST][json_data[KEY_FEATURE_OUT_NAME]]
+      del(json_data[KEY_FEATURE_OUT_NAME_LIST])
+      json_data[KEY_FEATURE_ADD_NAME] = json_data[KEY_FEATURE_ADD_NAME_LIST][json_data[KEY_FEATURE_ADD_NAME]]
+      del(json_data[KEY_FEATURE_ADD_NAME_LIST])
+      json_data[KEY_FEATURE_SCA_NAME] = json_data[KEY_FEATURE_SCA_NAME_LIST][json_data[KEY_FEATURE_SCA_NAME]]      
+      del(json_data[KEY_FEATURE_SCA_NAME_LIST])
+      del(json_data[KEY_FEATURE_SEL_NAME])
+      del(json_data[KEY_FEATURE_SEL_NAME_LIST])
+      del(json_data[KEY_FEATURE_SEL_RATE_NAME])
+      json_result_list.append(json_data)
+    return json_result_list
+
+  def __writeToServerProjectDetail(self, _job):
+    print('__writeToServerProjectDetail')
+    project_name = _job.project_name    
+    column_list = _job.column_list
+    column_target = _job.column_target
+    eda_path = de_pdprofiling.getVisualizerHtmlFilePath(project_name)
+    out_path = df_outlier.getDataframeHtmlFilePath(project_name)
+    train_results = self.__makeTrainedResultJsonData(project_name)
+    detail_data = http_request.makeProjectDetailData(project_name, column_list, column_target, eda_path, out_path, train_results)
+    id, data = http_request.getProjectDetailIdnData(project_name)
+    if id == -1:
+      http_request.postHttp(http_request.PREFIX_DETAIL, detail_data)
+    else:
+      http_request.putHttp(http_request.PREFIX_DETAIL, id, detail_data)
+
   def __writeProjectInfo(self, _job):
     if (self.job_best):
       if self.job_best.score > _job.score:
@@ -127,6 +166,13 @@ class WorkerAdmin(WorkerObserver):
       self.job_best = _job
     info = project.ProjectMetaInfo(self.job_best.project_name, self.job_best.problem_type, self.job_best.model.metrics_name, self.job_best.score)
     info_dic = info.getDictionary()
+    id, data = http_request.getProjectIdnData(self.job_best.project_name)    
+    if id == -1:
+      http_request.postHttp(http_request.PREFIX_INFO, data)
+    else:
+      data['best_loss'] = self.job_best.score
+      http_request.putHttp(http_request.PREFIX_INFO, id, data)
+
     filepath = definitions.getProejctInfoFilePath(self.job_best.project_name)
     utils.writeJsonToFile(info_dic, filepath)
 

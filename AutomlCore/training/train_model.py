@@ -8,6 +8,7 @@ import numpy as np
 import json
 import joblib
 from utils import definitions, utils
+from utils.definitions import KEY_FEATURE_MODEL_NAME, KEY_FEATURE_MODEL_DRATE
 from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME, KEY_PROJECT_SCORE
 from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST, KEY_FEATURE_SEL_COL_LIST
 import datetime
@@ -54,8 +55,8 @@ class TrainModel:
     return x, y, _column_list
       
   def __splitXy(self, _df):
-    y = _df[[self.job.target_column]]
-    x = _df.drop(self.job.target_column, axis=1)
+    y = _df[[self.job.column_target]]
+    x = _df.drop(self.job.column_target, axis=1)
     return x, y
   
   def __minizeScore(self, _params):
@@ -104,12 +105,15 @@ class TrainModel:
     params = self.getBestParams()
     train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, params)
     test_x, test_y, test_columns = self.__getPreprocessedDf(self.job.df_test, params, train_columns)
+    train_x.to_csv('train_x.csv', index=False)
     model = self.__getSavedModel()
     if model == None:
       score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, params, _for_optimize=False)
       self.__saveTrainedModel(model)
     else:
       score = self.job.model.getTrainedModelScore(model, test_x, test_y, _for_optimize=False)
+    params[KEY_FEATURE_MODEL_NAME] = self.job.model.model_name
+    params[KEY_FEATURE_MODEL_DRATE] = self.job.data_ratio
     params[KEY_FEATURE_SEL_COL_LIST] = train_columns
     params[KEY_PROJECT_SCORE] = score
     self.__saveBestParams(params)

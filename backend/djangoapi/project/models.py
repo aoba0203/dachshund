@@ -6,7 +6,7 @@ class UploadFile(models.Model):
 
 # Create your models here.
 class Project(models.Model):
-  created = models.DateTimeField(auto_created=True)
+  created = models.DateTimeField(auto_now_add=True)
   updated = models.DateTimeField(auto_now=True)
   project_name = models.CharField(max_length=256)
   problem_type = models.CharField(max_length=48)

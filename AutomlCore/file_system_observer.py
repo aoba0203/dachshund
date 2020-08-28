@@ -1,7 +1,7 @@
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from utils import definitions
+from utils import definitions, http_request
 import os
 import pandas as pd
 from eda import de_pdprofiling, df_outlier
@@ -31,7 +31,7 @@ class Handler(FileSystemEventHandler):
   @staticmethod
   def on_any_event(event):
     if event.is_directory:
-      return None
+      print('make directory')
     elif event.event_type == 'created':
       file_path = event.src_path
       file_name, file_extend = os.path.splitext(os.path.basename(file_path))
@@ -51,11 +51,14 @@ def __getProblemType(_problem_char):
   return definitions.PROBLEM_TYPE_CLASSIFICATION
 
 def trainAutoMl(file_path, file_name):
+  print('trainAutoML')
   # path_train_file = 'sample.csv'
   path_train_file = file_path    
   project_name = file_name
   c, target, name = file_name.split('_')
   problem_type = __getProblemType(c)
+  info_data = http_request.makeProjectInfoData(project_name, problem_type, 0.0)
+  http_request.postHttp(http_request.PREFIX_INFO, info_data)
   profiler = de_pdprofiling.PdProfiling(project_name, path_train_file)
   profiler.makeVisualizerHtmlFile()
 

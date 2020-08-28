@@ -8,10 +8,12 @@ PROBLEM_TYPE_REGRESSION = 'Regression'
 
 KEY_PROJECT_NAME = 'project_name'
 KEY_PROJECT_PROBLEM_TYPE = 'project_type'
-KEY_PROJECT_METRICS = 'project_metrics'
+KEY_PROJECT_METRICS = 'metrics_name'
 KEY_PROJECT_LOSS = 'project_loss'
 KEY_PROJECT_SCORE = 'score'
 
+KEY_FEATURE_MODEL_NAME = 'model_name'
+KEY_FEATURE_MODEL_DRATE = 'model_drate'
 KEY_FEATURE_ADD_NAME = 'feature_add'
 KEY_FEATURE_MIS_NAME = 'feature_missing'
 KEY_FEATURE_OUT_NAME = 'feature_outlier'
