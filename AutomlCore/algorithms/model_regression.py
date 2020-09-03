@@ -7,7 +7,10 @@ class ModelRegression:
     self.metrics_name = 'MeanAbsoluteError'
   
   def getTrainResults(self, _x, _y, _x_eval, _y_eval, _params, _for_optimize=True, scorer=mean_absolute_error):
-    model = self.getModel(_params)
+    if self.model_name == 'VecStackingClassifier':
+      model = self.getModel(_params, _x, _y, _x_eval)
+    else:
+      model = self.getModel(_params)
     model.fit(_x, _y)
     pred = model.predict(_x_eval)    
     return mean_absolute_error(_y_eval, pred), model

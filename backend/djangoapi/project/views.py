@@ -18,13 +18,10 @@ import json
 def index(request):
   form = UploadFileForm()
   if request.method == 'POST':
-    print(request)
     selected_option = request.POST.get('problem_type', None)  
     target = request.POST.get('target', None)
-    print("POST method, select: ", selected_option, ', target: ', target)
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
-      print("Valid")
       for count, x in enumerate(request.FILES.getlist("files")):
         def handle_uploaded_file(f):
           path = Path(os.getcwd()).parent.parent

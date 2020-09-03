@@ -3,6 +3,8 @@ import numpy as np
 from pathlib import Path
 import multiprocessing
 
+JSON_NONE = 'no'
+
 PROBLEM_TYPE_CLASSIFICATION = 'Classification'
 PROBLEM_TYPE_REGRESSION = 'Regression'
 

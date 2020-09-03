@@ -11,21 +11,21 @@ def getHttp(_prefix, _project_name=''):
   url = URL + _prefix + '?project=' + _project_name
   # print('getHttp: ', url)
   response = requests.get(url)
-  print('getHttp - response: ', response)
+  # print('getHttp - response: ', response)
   return response.status_code, response.text
 
 def postHttp(_prefix, _data):
   url = URL + _prefix
   # print('postHttp: ', url, ', data: ', _data)
   response = requests.post(url, _data)
-  print('postHttp - response: ', response)
+  # print('postHttp - response: ', response)
   return response.status_code, response.text
 
 def putHttp(_prefix, _id, _data):
   url = URL + _prefix + str(_id)
   # print('putHttp: ', url, ', data: ', _data)
   response = requests.put(url, _data)
-  print('putHttp - response: ', response)
+  # print('putHttp - response: ', response)
   return response.status_code, response.text
 
 def getProjectIdnData(_project_name):

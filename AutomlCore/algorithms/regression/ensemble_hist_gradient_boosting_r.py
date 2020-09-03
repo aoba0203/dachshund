@@ -28,6 +28,10 @@ class HistGradientBoostingRegressor(model.Model, model_regression.ModelRegressio
     }
 
   def getModel(self, _params):
+    if _params['max_leaf_nodes'] == definitions.JSON_NONE:
+      _params['max_leaf_nodes'] = None
+    if _params['max_depth'] == definitions.JSON_NONE:
+      _params['max_depth'] = None    
     return HistGradientBoosting(
       learning_rate= _params['learning_rate'],
       max_iter= int(_params['max_iter']),

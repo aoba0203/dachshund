@@ -17,12 +17,13 @@ import threading
 from eda import de_pdprofiling, df_outlier
 from multiprocessing import Lock
 from utils import definitions
-from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
+from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_COL_LIST, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME
 from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST
 import queue
 import pandas as pd
 import project
 import glob
+import urllib.request
 
 class WorkerAdmin(WorkerObserver):
   def __init__(self, _problem_type, _project_name, _df, _target_column, _ensemble_model_list, _worker_count=4):
@@ -33,8 +34,8 @@ class WorkerAdmin(WorkerObserver):
     self.ensemble_model_list =_ensemble_model_list
     self.worker_count = _worker_count
     self.train_stage = 0
-    self.train_model_count_list = [20, 10, 7, 5, 3]
-    self.train_data_ratio_list = [15, 30, 40, 50, 100, 100]
+    self.train_model_count_list = [20, 7, 5, 3]
+    self.train_data_ratio_list = [15, 30, 50, 100, 100]
     self.job_best = None
     self.job_list = []
     self.trained_job_list = []
@@ -43,14 +44,22 @@ class WorkerAdmin(WorkerObserver):
     self.job_queue = queue.Queue()
     self.__initDataProcess()
     self.train, self.test = train_test_split(self.df, test_size=0.2)
-    return  
+    # self.public_ip = self.__getPubilcIp()
   
+  def __getPubilcIp(self):
+    try:
+      ip = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode('utf-8')
+      return ip
+    except:
+      return '0.0.0.0'
+
   def __initDataProcess(self):
     df = utils.splitDateColumns(self.df)
     self.df = utils.convertObjectType(df)   
 
   def makeJobQueue(self, _model_list):
     # for idx, ratio in enumerate(self.data_ratio_list):
+    
     ratio = self.train_data_ratio_list[self.train_stage]
     train = self.train.sample(int(len(self.train) * (ratio * 0.01)))
     for model in _model_list:
@@ -140,6 +149,9 @@ class WorkerAdmin(WorkerObserver):
       del(json_data[KEY_FEATURE_SEL_NAME])
       del(json_data[KEY_FEATURE_SEL_NAME_LIST])
       del(json_data[KEY_FEATURE_SEL_RATE_NAME])
+
+      del(json_data[KEY_FEATURE_ADD_NAME])
+      del(json_data[KEY_FEATURE_SEL_COL_LIST])
       json_result_list.append(json_data)
     return json_result_list
 
@@ -149,7 +161,7 @@ class WorkerAdmin(WorkerObserver):
     column_list = _job.column_list
     column_target = _job.column_target
     eda_path = de_pdprofiling.getVisualizerHtmlFilePath(project_name)
-    out_path = df_outlier.getDataframeHtmlFilePath(project_name)
+    out_path = df_outlier.getDataframeHtmlFilePath(project_name)  
     train_results = self.__makeTrainedResultJsonData(project_name)
     detail_data = http_request.makeProjectDetailData(project_name, column_list, column_target, eda_path, out_path, train_results)
     id, data = http_request.getProjectDetailIdnData(project_name)

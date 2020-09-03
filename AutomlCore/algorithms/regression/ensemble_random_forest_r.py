@@ -32,9 +32,13 @@ class RandomForestRegressor(model.Model, model_regression.ModelRegression):
     }
 
   def getModel(self, _params):
+    if _params['max_depth'] == definitions.JSON_NONE:
+      _params['max_depth'] = None
+    if _params['max_features'] == definitions.JSON_NONE:
+      _params['max_features'] = None
     return RandomForest(
       n_estimators= int(_params['n_estimators']),
-      # criterion= _params['criterion'],
+      # criterion= _params['criterion'],        
       max_depth= _params['max_depth'],
       # min_samples_split= _params['min_samples_split'],
       # min_samples_leaf= _params['min_samples_leaf'],

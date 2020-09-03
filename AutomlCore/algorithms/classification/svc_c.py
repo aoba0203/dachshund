@@ -27,6 +27,8 @@ class SvcClassifier(model.Model, model_classification.ModelClassification):
     }
 
   def getModel(self, _params):
+    if _params['class_weight'] == definitions.JSON_NONE:
+      _params['class_weight'] = None
     return SVC(
       C= _params['C'],
       kernel= _params['kernel'],

@@ -31,6 +31,8 @@ class GradientBoostingClassifier(model.Model, model_classification.ModelClassifi
     }
 
   def getModel(self, _params):
+    if _params['max_features'] == definitions.JSON_NONE:
+      _params['max_features'] = None
     return GradientBoosting(
       # loss= _params['loss'],
       learning_rate= _params['learning_rate'],

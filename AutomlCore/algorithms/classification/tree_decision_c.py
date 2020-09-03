@@ -29,6 +29,8 @@ class DecisionTreeClassifier(model.Model, model_classification.ModelClassificati
     }
 
   def getModel(self, _params):
+    if _params['max_features'] == definitions.JSON_NONE:
+      _params['max_features'] = None
     return DecisionTree(
       criterion= _params['criterion'],
       splitter= _params['splitter'],

@@ -32,7 +32,11 @@ class ExtraTreesClassifier(model.Model, model_classification.ModelClassification
       # 'ccp_alpha': hp.uniform('ccp_alpha', 0, 2),
     }
 
-  def getModel(self, _params):
+  def getModel(self, _params):    
+    if _params['max_features'] == definitions.JSON_NONE:
+      _params['max_features'] = None
+    if _params['class_weight'] == definitions.JSON_NONE:
+      _params['class_weight'] = None
     return ExtraTrees(
       n_estimators= int(_params['n_estimators']),
       criterion= _params['criterion'],

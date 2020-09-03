@@ -34,6 +34,12 @@ class RandomForestClassifier(model.Model, model_classification.ModelClassificati
     }
 
   def getModel(self, _params):
+    if _params['max_depth'] == definitions.JSON_NONE:
+      _params['max_depth'] = None
+    if _params['max_features'] == definitions.JSON_NONE:
+      _params['max_features'] = None
+    if _params['class_weight'] == definitions.JSON_NONE:
+      _params['class_weight'] = None
     return RandomForest(
       n_estimators= int(_params['n_estimators']),
       criterion= _params['criterion'],

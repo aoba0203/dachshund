@@ -8,7 +8,7 @@ import numpy as np
 import json
 import joblib
 from utils import definitions, utils
-from utils.definitions import KEY_FEATURE_MODEL_NAME, KEY_FEATURE_MODEL_DRATE
+from utils.definitions import KEY_FEATURE_MODEL_NAME, KEY_FEATURE_MODEL_DRATE, JSON_NONE
 from utils.definitions import KEY_FEATURE_ADD_NAME, KEY_FEATURE_MIS_NAME, KEY_FEATURE_OUT_NAME, KEY_FEATURE_SCA_NAME, KEY_FEATURE_SEL_NAME, KEY_FEATURE_SEL_RATE_NAME, KEY_PROJECT_SCORE
 from utils.definitions import KEY_FEATURE_ADD_NAME_LIST, KEY_FEATURE_MIS_NAME_LIST, KEY_FEATURE_OUT_NAME_LIST, KEY_FEATURE_SCA_NAME_LIST, KEY_FEATURE_SEL_NAME_LIST, KEY_FEATURE_SEL_COL_LIST
 import datetime
@@ -21,7 +21,7 @@ class TrainModel:
     self.job = _job
     self.f_add = feature_add.FeatureAdd().getFeatureAddMethodList()
     self.f_missing = feature_missing.MissingData().getMissingDataMethodList()
-    self.f_outlier = feature_outlier.FeatureOutlier().getRemovedOutlierMethodList()
+    self.f_outlier = feature_outlier.FeatureOutlier(_job.data_ratio).getRemovedOutlierMethodList()
     self.f_scaler = feature_scaler.FeatureScaler().getFeatureScalerMethodList()
     self.f_selection = feature_selection.FeatureSelection(_job.problem_type).getFeatureSelectionMethodList()
     self.feature_selection_list = [0.5, 0.7, 0.8, 0.9]
@@ -62,7 +62,7 @@ class TrainModel:
   def __minizeScore(self, _params):
     # train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, _params)
     train_x, train_y, train_columns = self.__getPreprocessedDf(self.job.df_train, _params)
-    test_x, test_y, test_columns = self.__getPreprocessedDf(self.job.df_test, _params, train_columns)
+    test_x, test_y, test_columns = self.__getPreprocessedDf(self.job.df_test, _params)
     score, model = self.job.model.getTrainResults(train_x, train_y, test_x, test_y, _params['model'])
     # if self.best_score > score:
     #   self.job.setTrainedModel(trained_model)
@@ -72,7 +72,10 @@ class TrainModel:
     params = self.job.model.params_list
     for key, value in zip(params.keys(), params.values()):
       v_idx = _best[key]
-      _best[key]= params[key][v_idx]    
+      if params[key][v_idx] == None:
+        _best[key] = JSON_NONE
+      else:
+        _best[key]= params[key][v_idx]      
     _best[KEY_FEATURE_ADD_NAME_LIST] = list(self.f_add.keys())
     _best[KEY_FEATURE_MIS_NAME_LIST] = list(self.f_missing.keys())
     _best[KEY_FEATURE_OUT_NAME_LIST] = list(self.f_outlier.keys())
@@ -116,6 +119,9 @@ class TrainModel:
     params[KEY_FEATURE_MODEL_DRATE] = self.job.data_ratio
     params[KEY_FEATURE_SEL_COL_LIST] = train_columns
     params[KEY_PROJECT_SCORE] = score
+    for key, value in zip(params.keys(), params.values()):
+      if value == None:
+        params[key] = JSON_NONE
     self.__saveBestParams(params)
     return params, model, score
   

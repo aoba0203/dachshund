@@ -27,6 +27,8 @@ class NuSvcClassifier(model.Model, model_classification.ModelClassification):
     }
 
   def getModel(self, _params):
+    if _params['class_weight'] == definitions.JSON_NONE:
+      _params['class_weight'] = None
     return NuSVC(
       # nu= _params['nu'],
       kernel= _params['kernel'],
